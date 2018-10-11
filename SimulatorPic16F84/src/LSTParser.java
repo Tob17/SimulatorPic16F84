@@ -30,6 +30,7 @@ public class LSTParser {
   
   /* >>> METHODS <<< */
   
+  //reading file as text
   public String[] readFile() throws IOException
     {
 	  
@@ -58,54 +59,56 @@ public class LSTParser {
 	  
     }
   
-    public String[] extractCodeline(String[] codeFile) 
-      {
-    	String[] codeString = new String[codeFile.length];
-    	int codeLineCounter = 0;
+  //extracting and cutting machinecode from textfiles
+  public String[] extractCodeline(String[] codeFile) 
+     {
+      String[] codeString = new String[codeFile.length];
+      int codeLineCounter = 0;
     	
-    	// reading codeFile line to line
-    	for(int i = 0; i < codeFile.length; i++)
-    	  {
+      for(int i = 0; i < codeString.length; i++)
+        codeString[i] = "";
+    	
+      // reading codeFile line to line
+        for(int i = 0; i < codeFile.length; i++)
+          {
     	   // if the line starts with a space -> it doesn´t contain actual code
            if(codeFile[i].charAt(0) != ' ')	
              {
         	  codeLineCounter ++;
-              for(int j = 0; j < 9; j++)	
+              for(int j =0; j < 9; j++)	
     		    codeString[i] += Character.toString(codeFile[i].charAt(j));		
              }
     	  }
     	
-    /*	String[] rightSizedCodeString = new String[codeLineCounter];
-    	int a = 0;
+    	// cutting of those lines which doesnt contain any code
+    	String[] rightSizedCodeString = new String[codeLineCounter];
+    	int rightSizedCodeStringCounter = 0; // Amount of line of code that have machine code
     	
-    	for(int i = 0; i< codeString.length; ++i)
-    	{
-    		if(codeString[i] != null)
-    		{
-    		  rightSizedCodeString[a] = codeString[i];
-    		  a++;
-    		}
-    		
-    	} */
+    	for(int i = 0; i< codeString.length; i++)
+    	  {
+    	   if(codeString[i] != "")
+    	     {
+    		  rightSizedCodeString[rightSizedCodeStringCounter] = codeString[i];
+    		  rightSizedCodeStringCounter++;
+    		 }
+    	  } 
     	
-    	return codeString;
+    	return rightSizedCodeString;
       }
   
-	public void closeFile()
-	  {
-	   try 
-	     {
-		  bufferedReader.close();
-	      System.out.println("File closed!");
-	     } 
-	   catch (IOException e) 
-	     {
-		  System.out.println("Can´t close File!!");
-		  e.printStackTrace();
-		 }
-	  }
-	
-	
-	
+   //close file that has been opened
+   public void closeFile()
+     {
+	  try 
+	    {
+		 bufferedReader.close();
+	     System.out.println("File closed!");
+	    } 
+	  catch (IOException e) 
+	    {
+		 System.out.println("Can´t close File!!");
+		 e.printStackTrace();
+		}
+	 }
 
 }
