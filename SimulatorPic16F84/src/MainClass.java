@@ -15,6 +15,10 @@ public class MainClass {
 	for(int i = 0; i < text.length; i++)
 		System.out.println(text[i]);
 	
+	
+	String[] codeText = parser.extractCodeline(text);
+	for(int i = 0; i < codeText.length; i++)
+		System.out.println(codeText[i]);
 	parser.closeFile();
 
    

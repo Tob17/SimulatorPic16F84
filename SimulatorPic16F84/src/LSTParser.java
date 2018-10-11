@@ -58,17 +58,54 @@ public class LSTParser {
 	  
     }
   
+    public String[] extractCodeline(String[] codeFile) 
+      {
+    	String[] codeString = new String[codeFile.length];
+    	int codeLineCounter = 0;
+    	
+    	// reading codeFile line to line
+    	for(int i = 0; i < codeFile.length; i++)
+    	  {
+    	   // if the line starts with a space -> it doesn´t contain actual code
+           if(codeFile[i].charAt(0) != ' ')	
+             {
+        	  codeLineCounter ++;
+              for(int j = 0; j < 9; j++)	
+    		    codeString[i] += Character.toString(codeFile[i].charAt(j));		
+             }
+    	  }
+    	
+    /*	String[] rightSizedCodeString = new String[codeLineCounter];
+    	int a = 0;
+    	
+    	for(int i = 0; i< codeString.length; ++i)
+    	{
+    		if(codeString[i] != null)
+    		{
+    		  rightSizedCodeString[a] = codeString[i];
+    		  a++;
+    		}
+    		
+    	} */
+    	
+    	return codeString;
+      }
+  
 	public void closeFile()
 	  {
 	   try 
-	     {bufferedReader.close();
-	     System.out.println(reader + "File closed!");} 
+	     {
+		  bufferedReader.close();
+	      System.out.println("File closed!");
+	     } 
 	   catch (IOException e) 
 	     {
 		  System.out.println("Can´t close File!!");
 		  e.printStackTrace();
 		 }
 	  }
+	
+	
 	
 
 }
