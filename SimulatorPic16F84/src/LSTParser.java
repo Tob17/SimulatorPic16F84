@@ -48,7 +48,7 @@ public class LSTParser {
 		// Reading lines into a 200 sized String-Array
 		while((fileText[i] = bufferedReader.readLine()) != null)
 			{i++;}
-		
+		//as
 
 		// Cutting the output with the right size
 		// Remove the line with no data in fileText
