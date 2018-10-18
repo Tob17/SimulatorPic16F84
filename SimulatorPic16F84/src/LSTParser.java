@@ -118,11 +118,28 @@ public class LSTParser {
   
   
    // Cuts an extracted sequence of machinecode into address- und commandsections
-   public String[][] extractCommandsAndAddresses(String[] machineCodeLines)
+   public String[] extractCommandsFromStrings(String[] machineCodeLines)
      {
-	   /* TODO: Cutting each line of machinecode into adress- and commandsection and putting them side by side in an array */	   
-	   return new String[0][0];
+	   //Index of Array = Machineadresses, Value = Machinecode
+	   String[] programStorage = new String[machineCodeLines.length];
+	   
+	   for(int i = 0; i < machineCodeLines.length; i++)
+	     programStorage[i] = machineCodeLines[i].substring(5,9);
+	      
+	   return programStorage;
      }
+
+   //Converts Sequence of String-Commands to Sequence of Interger-Commands
+   public int[] convertStringCommandsToInteger(String[] stringCommands)
+     {
+	   int integerCommands[] = new int[stringCommands.length];
+	   
+	   for(int i = 0; i< stringCommands.length; ++i)
+		 integerCommands[i] =  Integer.decode("0x" + stringCommands[i]);
+
+	  return integerCommands; 
+     }
+   
   
   
    // Takes a text-file as an argument and prints each line of it
