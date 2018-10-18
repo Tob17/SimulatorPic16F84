@@ -3,15 +3,20 @@ public class Pic16F84Registers {
 
 	/* TODO: Adding every register available in the Pic16F84 */
 	
-	static byte W_REGISTER = 0;
 	
+	/* >>> REGISTERS <<< */
+	
+	static byte W_REGISTER = 0;
+	static short PC = 0;
 	static byte PSW = 0; 
 	// LSB Sequence
 	// bit0 = C-Flag
 	// bit1 = DC-Flag
 	// bit2 = Z-Flag
 	
-	static boolean C_Flag = false;
+	
+	/* >>> FLAG-SETTERS <<< */
+	
 	//Sets a flag identified by a name
 	static void set_Flag(String flag)
 	  {
@@ -46,6 +51,10 @@ public class Pic16F84Registers {
 		 }
 	  }
 	
+	
+	
+	/* >>> PRINTING FLAGS & REGISTERS <<< */
+	
 	//Prints all flags
 	static void printAllFlags()
 	{System.out.println("C-Flag = " + (PSW & (1)) + " DC-Flag = " + (PSW >> 1 & (1))+ " Z-Flag = " + (PSW >> 2 & (1)) );}
@@ -57,4 +66,6 @@ public class Pic16F84Registers {
 	//Prints the W-Register
 	static void printWRegister()
 	{System.out.println("W-Register = " + String.format("0x%2X", Pic16F84Registers.W_REGISTER) + "H");}	
+	
+	
 }

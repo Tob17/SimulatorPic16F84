@@ -6,7 +6,6 @@ public class SimulatorGUI extends JPanel {
 	
 	
   /* >>> Class-Methods <<< */
-	
 
   // Creating and initializing a Frame that hold our GUI
   public static void initFrame()

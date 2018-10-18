@@ -6,18 +6,17 @@ import java.io.FileNotFoundException;
 
 public class LSTParser {
 	
-	/* >>> Parser-Variables <<< */
+	
+	/* >>> PARSER-VARIABLES <<< */
+	
 	public FileReader reader;	// data reader
 	public BufferedReader bufferedReader;	// for reading each line of data 
-	// NOTE: can change to local variable
-	public String[] fileText = new String[200];	// save data from bufferedReader when it read
-
+	public String[] fileText = new String[200];	// save data from bufferedReader when it read // NOTE: can change to local variable
 
 	
 	
 	/* >>> CONSTRUCTOR <<< */
 
-	
   public LSTParser(String fileName)
     {  
 	 try
@@ -37,22 +36,18 @@ public class LSTParser {
   
   /* >>> METHODS <<< */
   
-  
   // Reading file as text
   public String[] readFile() throws IOException
     {	  
-	 if(reader != null && bufferedReader != null)	// When there is a data and not EOF
+	 if(reader != null && bufferedReader != null)	// When a file has been found
        {
 		int i = 0;	// Count how many line does this data have
 		
 		// Reading lines into a 200 sized String-Array
 		while((fileText[i] = bufferedReader.readLine()) != null)
 			{i++;}
-		//as
-
-		// Cutting the output with the right size
+		
 		// Remove the line with no data in fileText
-
 		String[] rightSizedOutput = new String[i];
 		for(int j = 0; j < i; ++j)
 			rightSizedOutput[j] = fileText[j];
@@ -62,65 +57,56 @@ public class LSTParser {
 	 else
 	   {
 		 String[] error = new String[1];
-		 error[0] = ">>ERROR: Canï¿½t read no file!!";
+		 error[0] = ">>ERROR: Can´t read no file!!";
 	 	return error; 
 	   }
-	  
     }
-  
 
-  // Extracting and cutting machine code from codeFile[]
-  public String[] extractCodeline(String[] codeFile) 
+  // Extracting and cutting machine code from codeFile[] (a plain text)
+  public String[] extractCodeline(String[] textFile) 
      {
-	  // new array with same length from codeFile
-	  // save first 9 char from codeFile to codeString
-      String[] codeString = new String[codeFile.length];	
-      int codeLineCounter = 0;
+      String[] codeString = new String[textFile.length]; // first cutting of the text
+      int codeLineCounter = 0; // counts the lines which contain actual code
     	
-      // Initialize array codeString with ""
+      //Initialize array codeString with ""
       for(int i = 0; i < codeString.length; i++)
         codeString[i] = "";
     	
-        // reading codeFile line to line
-        for(int i = 0; i < codeFile.length; i++)
-          {
-    	   // if the line starts with a space -> it does not contain actual code
-           if(codeFile[i].charAt(0) != ' ')	
-             {
-        	  codeLineCounter ++;
+      //Reading codeFile line to line
+      for(int i = 0; i < textFile.length; i++)
+        {
+    	 //If the line starts with a space -> it does not contain actual code
+         if(textFile[i].charAt(0) != ' ')	
+           {
+            codeLineCounter ++;
         	  
-        	  // Take first 9 char from each line and save to codeString
-        	  // NOTE: use subString maybe
-        	  // codeString[i] = codeFile[i].subString(0,9);
-              for(int j =0; j < 9; j++)	
-    		    codeString[i] += Character.toString(codeFile[i].charAt(j));		
-             }
-    	  }
+        	//Take first 9 char from each line and save to codeString
+            for(int j =0; j < 9; j++)	
+      	    codeString[i] = textFile[i].substring(0,9);
+           }
+        }
     	
-
-    	// cutting of those lines which do not contain any code
+    	//Cutting off those lines which do not contain any code
     	String[] rightSizedCodeString = new String[codeLineCounter];
     	int rightSizedCodeStringCounter = 0; // counter for rightSizedCodeString
     	
     	// Run through codeString
-    	for(int i = 0; i< codeString.length; i++)
+    	for(int i = 0; i < codeString.length; i++)
     	  {
-    	   // When the first char is not null then take this line from codeString to rightSizedCodeString
+    	   // When a String-line is not null then take this line from codeString to rightSizedCodeString
     	   if(codeString[i] != "")	 
     	     {
     		  rightSizedCodeString[rightSizedCodeStringCounter] = codeString[i];
     		  ++rightSizedCodeStringCounter;
     		 }
     	  } 
-    	
     	return rightSizedCodeString;
       }
   
-  
-   // Cuts an extracted sequence of machinecode into address- und commandsections
+   //Extracts commands in an assembly line of machinecode
    public String[] extractCommandsFromStrings(String[] machineCodeLines)
      {
-	   //Index of Array = Machineadresses, Value = Machinecode
+	   //Index of Array = Adresses, Value = Commands
 	   String[] programStorage = new String[machineCodeLines.length];
 	   
 	   for(int i = 0; i < machineCodeLines.length; i++)
@@ -132,15 +118,14 @@ public class LSTParser {
    //Converts Sequence of String-Commands to Sequence of Interger-Commands
    public int[] convertStringCommandsToInteger(String[] stringCommands)
      {
-	   int integerCommands[] = new int[stringCommands.length];
+	   int[] integerCommands = new int[stringCommands.length];
 	   
-	   for(int i = 0; i< stringCommands.length; ++i)
+	   for(int i = 0; i < stringCommands.length; i++)
 		 integerCommands[i] =  Integer.decode("0x" + stringCommands[i]);
 
 	  return integerCommands; 
      }
    
-  
   
    // Takes a text-file as an argument and prints each line of it
    public void printFile(String[] textFile)
@@ -148,7 +133,6 @@ public class LSTParser {
 		for(int i = 0; i < textFile.length; i++)
 			System.out.println(textFile[i]);
      }
-  
    
    // Closes file that has been opened
    public void closeFile()
