@@ -9,7 +9,7 @@ public class MainClass {
   public static void main(String[] abc) throws IOException 
    {
 	//SimulatorGUI.initFrame();  
-	LSTParser parser = new LSTParser(".\\src\\LSTFiles\\TPicSim2.LST");
+	LSTParser parser = new LSTParser("./src/LSTFiles/TPicSim2.LST");
 	
 	String[] text = parser.readFile();
 	for(int i = 0; i < text.length; i++)
