@@ -5,24 +5,24 @@ import javax.swing.*;
 
 public class MainClass {
 	
-	
   public static void main(String[] abc) throws IOException 
    {
 	//SimulatorGUI.initFrame();  
 	LSTParser parser = new LSTParser("./src/LSTFiles/TPicSim2.LST");
 	
-	String[] text = parser.readFile();
-	for(int i = 0; i < text.length; i++)
-		System.out.println(text[i]);
+	System.out.println("====================================================================");
 	
+	String[] text = parser.readFile();
+	parser.printFile(text);
+	
+	System.out.println("====================================================================");
 	
 	String[] codeText = parser.extractCodeline(text);
-	for(int i = 0; i < codeText.length; i++)
-		System.out.println(codeText[i]);
+	parser.printFile(codeText);
+	
+	System.out.println("====================================================================");
+	
 	parser.closeFile();
-
-   
    }
-		
-
+  
 }

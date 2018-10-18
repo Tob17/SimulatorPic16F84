@@ -7,6 +7,8 @@ public class SimulatorGUI extends JPanel {
 	
   /* >>> Class-Methods <<< */
 	
+
+  // Creating and initializing a Frame that hold our GUI
   public static void initFrame()
     {
 	 JFrame simulatorWindow = new JFrame("Simulator");
@@ -23,11 +25,14 @@ public class SimulatorGUI extends JPanel {
   
   /* >>> Object-Methods <<< */
   
-  /* Drawing GUI in the Frame */	
+  /* Drawing our GUI in the Frame */	
   public void paint(Graphics g)
     {
-	 Graphics2D g2d = (Graphics2D) g;
-	 g.fillRect(50,50,50,50);
+	 /* TODO: Drawing GUI-Elements */
+	 /* TODO: Visualizing data on our GUI */
 	}
+  
+  
+  /* TODO: specify user events! */
 
 }
