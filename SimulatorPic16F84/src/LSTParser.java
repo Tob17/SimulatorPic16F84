@@ -14,31 +14,30 @@ public class LSTParser {
 	public String[] fileText = new String[200];	// save data from bufferedReader when it read // NOTE: can change to local variable
 
 	
-	
 	/* >>> CONSTRUCTOR <<< */
 
-  public LSTParser(String fileName)
-    {  
-	 try
-	   { 
-		reader = new FileReader(fileName);
-	    bufferedReader = new BufferedReader(reader);
-	    System.out.println(">>File found and read!");
-	   }
-	 catch(FileNotFoundException e) 
-	   {
-		 System.out.println(">>ERROR: File not found!!");
-		 System.out.println(e);
-	   };
-    }
+    public LSTParser(String fileName)
+      {  
+	   try
+	    { 
+		  reader = new FileReader(fileName);
+	      bufferedReader = new BufferedReader(reader);
+	      System.out.println(">>File found and read!");
+	     }
+	   catch(FileNotFoundException e) 
+	     {
+		   System.out.println(">>ERROR: File not found!!");
+		   System.out.println(e);
+	     };
+      }
   
   
+    /* >>> METHODS <<< */
   
-  /* >>> METHODS <<< */
-  
-  // Reading file as text
-  public String[] readFile() throws IOException
-    {	  
+    // Reading file as text
+    public String[] readFile() throws IOException
+    {	 
+	 System.out.println("Reading Textfile...");
 	 if(reader != null && bufferedReader != null)	// When a file has been found
        {
 		int i = 0;	// Count how many line does this data have
@@ -63,9 +62,10 @@ public class LSTParser {
 	   }
     }
 
-  // Extracting and cutting machine code from codeFile[] (a plain text)
-  public String[] extractCodeline(String[] textFile) 
+    // Extracting and cutting machine code from codeFile[] (a plain text)
+    public String[] extractCodeline(String[] textFile) 
      {
+	  System.out.println("Extracting Codelines...");
       String[] codeString = new String[textFile.length]; // first cutting of the text
       int codeLineCounter = 0; // counts the lines which contain actual code
     	
@@ -73,16 +73,14 @@ public class LSTParser {
       for(int i = 0; i < codeString.length; i++)
         codeString[i] = "";
     	
-      //Reading codeFile line to line
+      //Reading textFile line to line
       for(int i = 0; i < textFile.length; i++)
         {
     	 //If the line starts with a space -> it does not contain actual code
          if(textFile[i].charAt(0) != ' ')	
            {
-            codeLineCounter ++;
-        	  
+            codeLineCounter ++;  
         	//Take first 9 char from each line and save to codeString
-            for(int j =0; j < 9; j++)	
       	    codeString[i] = textFile[i].substring(0,9);
            }
         }
@@ -98,26 +96,27 @@ public class LSTParser {
     	   if(codeString[i] != "")	 
     	     {
     		  rightSizedCodeString[rightSizedCodeStringCounter] = codeString[i];
-    		  ++rightSizedCodeStringCounter;
+    		  rightSizedCodeStringCounter++;
     		 }
     	  } 
     	return rightSizedCodeString;
       }
   
-   //Extracts commands in an assembly line of machinecode
-   public String[] extractCommandsFromStrings(String[] machineCodeLines)
+    //Extracts commands in an assembly line of machinecode
+    public String[] extractCommandsFromStrings(String[] codeLines)
      {
+	   System.out.println("Extracting Commands...");
 	   //Index of Array = Adresses, Value = Commands
-	   String[] programStorage = new String[machineCodeLines.length];
+	   String[] programStorage = new String[codeLines.length];
 	   
-	   for(int i = 0; i < machineCodeLines.length; i++)
-	     programStorage[i] = machineCodeLines[i].substring(5,9);
+	   for(int i = 0; i < codeLines.length; i++)
+	     programStorage[i] = codeLines[i].substring(5,9);
 	      
 	   return programStorage;
      }
 
-   //Converts Sequence of String-Commands to Sequence of Interger-Commands
-   public int[] convertStringCommandsToInteger(String[] stringCommands)
+    //Converts Sequence of String-Commands to Sequence of Interger-Commands
+    public int[] convertStringCommandsToInteger(String[] stringCommands)
      {
 	   int[] integerCommands = new int[stringCommands.length];
 	   
@@ -127,16 +126,15 @@ public class LSTParser {
 	  return integerCommands; 
      }
    
-  
-   // Takes a text-file as an argument and prints each line of it
-   public void printFile(String[] textFile)
+    // Takes a text-file as an argument and prints each line of it
+    public void printFile(String[] textFile)
      {
 		for(int i = 0; i < textFile.length; i++)
 			System.out.println(textFile[i]);
      }
    
-   // Closes file that has been opened
-   public void closeFile()
+    // Closes file that has been opened
+    public void closeFile()
      {
 	  try 
 	    {

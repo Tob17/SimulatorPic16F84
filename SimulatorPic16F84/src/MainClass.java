@@ -12,8 +12,11 @@ public class MainClass {
 	
 	//SimulatorGUI.initFrame();   
 	Simulator simulator = new Simulator();
-	simulator.initSimulator("./src/LSTFiles/TPicSim1.LST");
+	//1.Parameter = File-Path, 2.Parameter = Program-Page of Program-Memory, 3.Parameter = Custom amount of CPU-Cycles executed
+	simulator.initSimulator("./src/LSTFiles/TPicSim1.LST", 0, 50);
 	simulator.startSimulator();
+	
+	Pic16F84Registers.printProgramMemory();
    }
 
 }
