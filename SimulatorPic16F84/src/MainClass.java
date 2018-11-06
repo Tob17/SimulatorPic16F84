@@ -16,7 +16,8 @@ public class MainClass {
 	simulator.initSimulator("./src/LSTFiles/TPicSim1.LST", 0, 50);
 	simulator.startSimulator();
 	
-	Pic16F84Registers.printProgramMemory();
+	//Pic16F84Registers.printProgramMemory();
+	Pic16F84Registers.printPCL();
    }
 
 }

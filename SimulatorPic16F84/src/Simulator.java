@@ -46,6 +46,9 @@ public class Simulator {
 	  {	
 	   System.out.println("Starting execution...");
 	   System.out.println("====================================================================");
+	   Pic16F84Registers.printAllFlags();
+	   Pic16F84Registers.printAllRegisters();
+	   System.out.println("====================================================================");
 
 	   //Main-Routine
 	   if(programMemoryContainsProgram)
@@ -74,13 +77,20 @@ public class Simulator {
 	   if(Pic16F84Registers.INSTRUCTION_REGISTER != -1)
 	     {
 	      CommandExecution.execute(Pic16F84Registers.INSTRUCTION_REGISTER);
-		  Pic16F84Registers.printWRegister();
 		  Pic16F84Registers.printAllFlags();
-		  Pic16F84Registers.printPSW();
+		  Pic16F84Registers.printAllRegisters();
+		  System.out.println("====================================================================");  
+	     }
+	   else
+	     {
+		  System.out.println("====================================================================");
+		  System.out.println("Instruction-Register is empty!");  
 		  System.out.println("====================================================================");  
 	     }
 	   //Fetch PC (Pipe 2.)
 	   Pic16F84Registers.INSTRUCTION_REGISTER = Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]; 
+	   System.out.println("Fetched " + String.format("%2X", Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]) + "h" + " from " + "Program-Memory[" + Pic16F84Registers.PC + "]");  
+	   System.out.println("====================================================================");  
 	  }
 	
 	//Copies the program extracted from the textfile into the static Program-Memory

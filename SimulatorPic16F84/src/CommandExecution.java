@@ -12,30 +12,30 @@ public class CommandExecution {
 	  {
 	   int[] opcAndArguments = CommandInterpreter.decode(command);
 	   
-	   Pic16F84Registers.PC++; // inkrementing PC as part of the execution!
-		
+	   Pic16F84Registers.incrementPC(); // inkrementing PC as part of the execution!
+	   
 	   switch(opcAndArguments[0]) //OPC
 	     { 			   
 		  case 0x3000: //MOVLW (Move A1 to W)
-			System.out.println("Moving " + String.format("%2X", opcAndArguments[1]) + "h" + " to W" );
+			System.out.println("MOVLW: " + "Moving " + String.format("%2X", opcAndArguments[1]) + "h" + " to W" );
 		    Pic16F84Registers.W_REGISTER = (byte) opcAndArguments[1];
 		    checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 			   	
 		  case 0x3900: //ANDLW (A1 AND W to W)
-			System.out.println(String.format("%2X", opcAndArguments[1]) + "h" + " AND " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
+			System.out.println("ANDLW: " + String.format("%2X", opcAndArguments[1]) + "h" + " AND " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
 			Pic16F84Registers.W_REGISTER = (byte) (Pic16F84Registers.W_REGISTER & opcAndArguments[1]); 				  
 			checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 				
 		  case 0x3800: //IORLW (A1 IOR W to W)
-			System.out.println(String.format("%2X", opcAndArguments[1]) + "h" + " IOR " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
+			System.out.println("IORLW: " + String.format("%2X", opcAndArguments[1]) + "h" + " IOR " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
 		    Pic16F84Registers.W_REGISTER = (byte) (Pic16F84Registers.W_REGISTER | opcAndArguments[1]); 				  
 		    checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 			   	
 		  case 0x3C00: //SUBLW (A1 - W to W)
-			System.out.println(String.format("%2X", opcAndArguments[1]) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
+			System.out.println("SUBLW: " + String.format("%2X", opcAndArguments[1]) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
 			checkRegisterForDigitCarry((byte)opcAndArguments[1],(byte)(~Pic16F84Registers.W_REGISTER+1));
 			checkForUnderflow(Pic16F84Registers.W_REGISTER, (byte)opcAndArguments[1]);
 		    Pic16F84Registers.W_REGISTER = (byte) (opcAndArguments[1] + (~Pic16F84Registers.W_REGISTER + 1)); 				  
@@ -43,13 +43,13 @@ public class CommandExecution {
 			break;	
 				 
 		  case 0x3A00: //XORLW (A1 XOR W to W)
-			System.out.println(String.format("%2X", opcAndArguments[1]) + "h" + " XOR " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
+			System.out.println("XORLW: " + String.format("%2X", opcAndArguments[1]) + "h" + " XOR " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
 		    Pic16F84Registers.W_REGISTER = (byte) (Pic16F84Registers.W_REGISTER ^ opcAndArguments[1]); 				  
 		    checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 			  
 		  case 0x3E00: //ADDLW (A1 + W to W)
-			System.out.println(String.format("%2X", opcAndArguments[1]) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
+			System.out.println("ADDLW: " + String.format("%2X", opcAndArguments[1]) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
 		    checkRegisterForDigitCarry((byte)opcAndArguments[1], Pic16F84Registers.W_REGISTER);
 		    checkForOverflow((byte)opcAndArguments[1], Pic16F84Registers.W_REGISTER); 
 			Pic16F84Registers.W_REGISTER = (byte) (opcAndArguments[1] + Pic16F84Registers.W_REGISTER); 				  
@@ -57,8 +57,9 @@ public class CommandExecution {
 			break;	
 			
 		  case 0x2800: //GOTO (Jump to adress A1)
-			System.out.println("Jumping to: " + String.format("%2X", opcAndArguments[1]) + "h");
-			Pic16F84Registers.PC = (short) opcAndArguments[1];
+			System.out.println("GOTO: " + "Jumping to adress: " + String.format("%2X", opcAndArguments[1]) + "h");
+			Pic16F84Registers.flushInstructionRegister();
+			Pic16F84Registers.computedGOTO((short)opcAndArguments[1]);
 			break;	
 		 } 
 	  }

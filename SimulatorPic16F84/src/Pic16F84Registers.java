@@ -41,6 +41,45 @@ public class Pic16F84Registers {
 	static short[] STACK = new short[8];
 	// 8 Level Stack with 13 Bit PC each
 	
+	static short[] RAM_BANK_0 = new short[128];
+	// 128 1-Byte-dataregister addresses, while only 68 are physically implemented general purpose RAM-Registers (SRAM)
+	// >>>Data (Ram) starts at: 0Ch
+	// >>>Data (Ram) ends at: 4Fh
+	
+	// Adresses of Registers:
+	// >>>00h: indirect adressing
+	// >>>01h: Timer-0-Register
+	// >>>02h: PCL-Register
+	// >>>03h: Status-Register
+	// >>>04h: File-Select-Register
+	// >>>05h: Port-A-Register
+	// >>>06h: PORT-B-Register
+	// >>>07h: not used...
+	// >>>08h: EEPROM-Data-Register
+	// >>>09h: EEPROM-Adress-Register
+	// >>>0Ah: PCLATH-Register
+	// >>>0Bh: Interrupt-Control-Register
+	
+	static short[] RAM_BANK_1 = new short[128];
+	// Follow-up to the adress-mapping of RAM_BANK_0 
+	// RAM-Registers(68) of Bank 2 are mapped in Bank 0
+	// >>>Data (Ram) starts at: 8Ch
+	// >>>Data (Ram) ends at: CFh
+	
+	// Adresses of Registers:
+	// >>>80h: indirect adressing
+	// >>>81h: Option-Register
+	// >>>82h: PCL-Register
+	// >>>83h: Status-Register
+	// >>>84h: File-Select-Register
+	// >>>85h: TRIS-A-Register
+	// >>>86h: TRIS-B-Register
+	// >>>87h: not used...
+	// >>>88h: EEPROM-Control-Register-1
+	// >>>89h: EEPROM-Control-Register-2
+	// >>>8Ah: PCLATH-Register
+	// >>>8Bh: Interrupt-Control-Register
+	
 
 	
 	/* >>> INIT REGISTERS <<< */
@@ -57,6 +96,7 @@ public class Pic16F84Registers {
        STACKPOINTER = 0;
 	   INSTRUCTION_REGISTER = -1;
 	   FSR = 0;
+	   RAM_BANK_0[2] = PCL;
 	  }
     
     
@@ -137,14 +177,36 @@ public class Pic16F84Registers {
        //Adding PCL
        PC += PCL;
       }
+    
+    //Increments PC and synchronizes PCL accordingly
+    static void incrementPC()
+      {
+       //Checking if PCL is not overflowing uppon the next incrementation
+       if(PCL != 0b11111111)
+         {
+          PCL++;
+          loadPCLToPC();
+         }
+       //If PCL is overflowing, giving out a warning and resetting PCL to 0 (beginning of the program-segment)
+       else
+         {
+ 		  System.out.println("====================================================================");  
+    	  System.out.println("Warning: PCL overflowed and resetted to 0");
+    	  System.out.println("Starting with first instruction again...");
+		  System.out.println("====================================================================");  
+		  PCL = 0;
+		  loadPCLToPC();
+         }
+      }
+    
 
     //Loads an 8-Bit ALU-Result into the lower byte of the PC plus adding 5 PCLATH Bits to it
     static void computedJUMP(byte aluResult)
       {
-       //Cleaning lower 8 Bit of PC
-       PC = (short)(PC & 0b1111100000000);
-       //Adding result of ALU
-       PC += aluResult;
+       //Loading PCL with aluResult
+       PCL = aluResult;
+       //Loading PC with PCL
+       loadPCLToPC();
        //Loading 5-Bit PCLATH
        load5BitPCLATHToPC();
       }
@@ -152,6 +214,8 @@ public class Pic16F84Registers {
     //Loads an 11-Bit goto-adress into the lower 11 Bits of the PC plus adding 2 PCLATH Bits to it
     static void computedGOTO(short gotoAdress)
       {
+       //Loading PCL with lower 8 bits of gotoAdress
+       PCL = (byte)(gotoAdress & 0b00011111111);
        //Cleaning lower 11 Bit of PC
        PC = (short)(PC & 0b1100000000000);
        //Adding goto-adress to PC
@@ -159,6 +223,10 @@ public class Pic16F84Registers {
        //Loading 2-Bit PCLATH
        load2BitPCLATHToPC();
       }
+    
+    //Erasing content of the Instruction-Register e.g. as part of goto-instructions
+    static void flushInstructionRegister()
+      {INSTRUCTION_REGISTER = -1;}
 	
     
 	/* >>> FLAG-METHODS <<< */
@@ -203,7 +271,7 @@ public class Pic16F84Registers {
 	
 	//Prints all flags
 	static void printAllFlags()
-	{System.out.println("C-Flag = " + (PSW & (1)) + " DC-Flag = " + (PSW >> 1 & (1))+ " Z-Flag = " + (PSW >> 2 & (1)) );}
+	{System.out.println("*C-Flag = " + (PSW & (1)) + " *DC-Flag = " + (PSW >> 1 & (1))+ " *Z-Flag = " + (PSW >> 2 & (1)) );}
 	
 	//Prints PSW
 	static void printPSW()
