@@ -232,6 +232,7 @@ public class Pic16F84Registers {
       {INSTRUCTION_REGISTER = -1;}
 	
     
+    
 	/* >>> FLAG-METHODS <<< */
 	
 	//Sets a flag identified by a name
