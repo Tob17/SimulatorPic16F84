@@ -96,7 +96,6 @@ public class Pic16F84Registers {
        STACKPOINTER = 0;
 	   INSTRUCTION_REGISTER = -1;
 	   FSR = 0;
-	   RAM_BANK_0[2] = PCL;
 	  }
     
     
@@ -176,32 +175,36 @@ public class Pic16F84Registers {
        PC = (short)(PC & 0b1111100000000);
        //Adding PCL
        PC += PCL;
+       load5BitPCLATHToPC();
       }
+    
+    static void loadPCToPCL()
+      {PCL = (byte) (PC & 0b11111111);}
     
     //Increments PC and synchronizes PCL accordingly
     static void incrementPC()
       {
-       //Checking if PCL is not overflowing uppon the next incrementation
-       if(PCL != 0b11111111)
-         {
-          PCL++;
-          loadPCLToPC();
-         }
-       //If PCL is overflowing, giving out a warning and resetting PCL to 0 (beginning of the program-segment)
+    	//Checking if PC is not overflowing uppon the next incrementation
+       if(!((PC & 0b0011111111111) == 0b11111111111))
+          {
+    	   PC++;
+    	   loadPCToPCL();
+          }
+       //If PC is overflowing uppon the next incrementation
        else
          {
+    	  PC = (short)(PC & 0b1100000000000);
+    	  loadPCToPCL();
  		  System.out.println("====================================================================");  
-    	  System.out.println("Warning: PCL overflowed and resetted to 0");
-    	  System.out.println("Starting with first instruction again...");
+    	  System.out.println("Warning: PC overflowed and resetted to 0");
+    	  System.out.println("Starting with first line again...");
 		  System.out.println("====================================================================");  
-		  PCL = 0;
-		  loadPCLToPC();
-         }
+         }    	
       }
     
 
     //Loads an 8-Bit ALU-Result into the lower byte of the PC plus adding 5 PCLATH Bits to it
-    static void computedJUMP(byte aluResult)
+    static void changePCL(byte aluResult)
       {
        //Loading PCL with aluResult
        PCL = aluResult;
