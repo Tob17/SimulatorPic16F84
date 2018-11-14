@@ -1,8 +1,37 @@
+import java.util.HashMap;
+import java.util.Map;
 
 public class Pic16F84Registers {
 
 	/* TODO: Adding every register available in the Pic16F84 */
-	
+	static Map <Integer, String> aMap = new HashMap<Integer, String>();
+	static {
+		aMap.put(0x00, "Indirect addr.");
+		aMap.put(0x01, "TMR0");
+		aMap.put(0x02, "PCL");
+		aMap.put(0x03, "STATUS");
+		aMap.put(0x04, "FSR");
+		aMap.put(0x05, "PORTA");
+		aMap.put(0x06, "PORTB");
+		aMap.put(0x07, "");
+		aMap.put(0x08, "EEDATA");
+		aMap.put(0x09, "EEADR");
+		aMap.put(0x0A, "PCLATH");
+		aMap.put(0x0B, "INTCON");
+
+		aMap.put(0x80, "Indirect addr.");
+		aMap.put(0x81, "OPTION");
+		aMap.put(0x82, "PCL");
+		aMap.put(0x83, "STATUS");
+		aMap.put(0x84, "FSR");
+		aMap.put(0x85, "TRISA");
+		aMap.put(0x86, "TRISB");
+		aMap.put(0x87, "");
+		aMap.put(0x88, "EECON1");
+		aMap.put(0x89, "EECON2");
+		aMap.put(0x8A, "PCLATH");
+		aMap.put(0x8B, "INTCON");
+	}
 	
 	/* >>> REGISTERS <<< */
 	
