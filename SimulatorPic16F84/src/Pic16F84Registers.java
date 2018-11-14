@@ -4,34 +4,7 @@ import java.util.Map;
 public class Pic16F84Registers {
 
 	/* TODO: Adding every register available in the Pic16F84 */
-	static Map <Integer, String> aMap = new HashMap<Integer, String>();
-	static {
-		aMap.put(0x00, "Indirect addr.");
-		aMap.put(0x01, "TMR0");
-		aMap.put(0x02, "PCL");
-		aMap.put(0x03, "STATUS");
-		aMap.put(0x04, "FSR");
-		aMap.put(0x05, "PORTA");
-		aMap.put(0x06, "PORTB");
-		aMap.put(0x07, "");
-		aMap.put(0x08, "EEDATA");
-		aMap.put(0x09, "EEADR");
-		aMap.put(0x0A, "PCLATH");
-		aMap.put(0x0B, "INTCON");
 
-		aMap.put(0x80, "Indirect addr.");
-		aMap.put(0x81, "OPTION");
-		aMap.put(0x82, "PCL");
-		aMap.put(0x83, "STATUS");
-		aMap.put(0x84, "FSR");
-		aMap.put(0x85, "TRISA");
-		aMap.put(0x86, "TRISB");
-		aMap.put(0x87, "");
-		aMap.put(0x88, "EECON1");
-		aMap.put(0x89, "EECON2");
-		aMap.put(0x8A, "PCLATH");
-		aMap.put(0x8B, "INTCON");
-	}
 	
 	/* >>> REGISTERS <<< */
 	
@@ -71,45 +44,16 @@ public class Pic16F84Registers {
 	// 8 Level Stack with 13 Bit PC each
 	
 	static short[] RAM_BANK_0 = new short[128];
-	// 128 1-Byte-dataregister addresses, while only 68 are physically implemented general purpose RAM-Registers (SRAM)
-	// >>>Data (Ram) starts at: 0Ch
-	// >>>Data (Ram) ends at: 4Fh
-	
-	// Adresses of Registers:
-	// >>>00h: indirect adressing
-	// >>>01h: Timer-0-Register
-	// >>>02h: PCL-Register
-	// >>>03h: Status-Register
-	// >>>04h: File-Select-Register
-	// >>>05h: Port-A-Register
-	// >>>06h: PORT-B-Register
-	// >>>07h: not used...
-	// >>>08h: EEPROM-Data-Register
-	// >>>09h: EEPROM-Adress-Register
-	// >>>0Ah: PCLATH-Register
-	// >>>0Bh: Interrupt-Control-Register
+	// 128 1-byte-file-Registers in bank 0
+	// 116 of which are general purpose registers
+	// 12 of which are special function registers
 	
 	static short[] RAM_BANK_1 = new short[128];
-	// Follow-up to the adress-mapping of RAM_BANK_0 
-	// RAM-Registers(68) of Bank 2 are mapped in Bank 0
-	// >>>Data (Ram) starts at: 8Ch
-	// >>>Data (Ram) ends at: CFh
-	
-	// Adresses of Registers:
-	// >>>80h: indirect adressing
-	// >>>81h: Option-Register
-	// >>>82h: PCL-Register
-	// >>>83h: Status-Register
-	// >>>84h: File-Select-Register
-	// >>>85h: TRIS-A-Register
-	// >>>86h: TRIS-B-Register
-	// >>>87h: not used...
-	// >>>88h: EEPROM-Control-Register-1
-	// >>>89h: EEPROM-Control-Register-2
-	// >>>8Ah: PCLATH-Register
-	// >>>8Bh: Interrupt-Control-Register
-	
+	// 128 1-byte-file-Registers in bank 1
+	// 116 of which are general purpose registers
+	// 12 of which are special function registers
 
+	
 	
 	/* >>> INIT REGISTERS <<< */
 	
@@ -169,6 +113,166 @@ public class Pic16F84Registers {
     	      System.out.println("====================================================================");	
     	      break;
          }
+      }
+    
+    //Accesses Data-Registers either in Bank 0 or Bank 1
+    static int readFileRegisterValue(byte fileRegisterAdress, byte bankSelection)
+      {
+       //Special Function Registers...
+       if((fileRegisterAdress % 128) < 0x0C && (fileRegisterAdress % 128) >= 0x00)
+         {   
+    	  //...in Bank 0
+          if(bankSelection == 0)
+            switch(fileRegisterAdress % 128)
+              {
+               case 0x00: //Indirect adresse read as 0
+     	         return  0;
+               case 0x01: // TMR0   TODO: IMPLEMENT!!
+     	         return -1;
+               case 0x02: // PCL
+    	         return PCL;
+               case 0x03: // STATUS
+      	         return PSW;
+               case 0x04: // FSR
+      	         return FSR;
+               case 0x05: // PORTA  TODO: IMPLEMENT!!
+      	         return -1;
+               case 0x06: // PORTB  TODO: IMPLEMENT!!
+      	         return -1;
+               case 0x07: //undefined
+      	         return -1;
+               case 0x08: //EEDATA  TODO: IMPLEMENT!!
+      	         return -1;
+               case 0x09: //EEADR   TODO: IMPLEMENT!!
+      	         return -1;
+               case 0x0A: //PCLATH
+      	         return PCLATH;
+               case 0x0B: //INTCON  TODO: IMPLEMENT!!
+      	         return -1;
+               default:
+    	         return -1;
+              }       
+          //... in Bank 1
+          if(bankSelection == 1)
+            switch(fileRegisterAdress % 128)
+              {
+               case 0x00: //Indirect adresse read as 0
+    	         return  0;
+               case 0x01: // OPTION   TODO: IMPLEMENT!!
+    	         return -1;
+               case 0x02: // PCL
+   	             return PCL;
+               case 0x03: // STATUS
+     	         return PSW;
+               case 0x04: // FSR
+     	         return FSR;
+               case 0x05: // TRISA  TODO: IMPLEMENT!!
+     	         return -1;
+               case 0x06: // TRISB  TODO: IMPLEMENT!!
+     	         return -1;
+               case 0x07: //undefined
+     	         return -1;
+               case 0x08: //EECON1  TODO: IMPLEMENT!!
+     	         return -1;
+               case 0x09: //EECON2 read as 0
+     	         return  0;
+               case 0x0A: //PCLATH
+     	         return PCLATH;
+               case 0x0B: //INTCON  TODO: IMPLEMENT!!
+     	         return -1;
+               default:
+   	             return -1;
+              }
+         } 
+       //General Purpose Registers...
+       else if ((fileRegisterAdress % 128) >= 0x0C)
+         {
+    	  //...in Bank 0
+          if(bankSelection == 0)
+            return RAM_BANK_0[fileRegisterAdress % 128];
+    	  //...in Bank 1
+          if(bankSelection == 1)
+            return RAM_BANK_1[fileRegisterAdress % 128];
+         }
+       
+       return -1;   	
+      }
+    
+    //Accesses Data-Registers either in Bank 0 or Bank 1
+    static void writeFileRegisterValue(int fileRegisterAdress, byte bankSelection, int value)
+      {
+       //Special Function Registers...
+       if((fileRegisterAdress % 128) < 0x0C && (fileRegisterAdress % 128) >= 0x00)
+         {
+     	  //...in Bank 0
+          if(bankSelection == 0)
+            switch(fileRegisterAdress % 128)
+              {
+               case 0x00: //Indirect adresse read as 0, never overwritten
+    	         break;
+               case 0x01: // TMR0   TODO: IMPLEMENT!!
+    	         break;
+               case 0x02: // PCL
+   	             PCL = (byte) value;
+               case 0x03: // STATUS
+     	         PSW = (byte) value;
+               case 0x04: // FSR
+     	         FSR = (byte) value;
+               case 0x05: // PORTA  TODO: IMPLEMENT!!
+     	         break;
+               case 0x06: // PORTB  TODO: IMPLEMENT!!
+     	         break;
+               case 0x07: //undefined
+     	         break;
+               case 0x08: //EEDATA  TODO: IMPLEMENT!!
+     	         break;
+               case 0x09: //EEADR   TODO: IMPLEMENT!!
+            	  break;
+               case 0x0A: //PCLATH
+     	         PCLATH = (byte) value;
+               case 0x0B: //INTCON  TODO: IMPLEMENT!!
+            	  break;
+              }
+          //... in Bank 1
+          if(bankSelection == 1)
+            switch(fileRegisterAdress % 128)
+              {
+               case 0x00: //Indirect adresse read as 0
+                 break;
+               case 0x01: // OPTION   TODO: IMPLEMENT!!
+            	 break;
+               case 0x02: // PCL
+   	             PCL = (byte) value;
+               case 0x03: // STATUS
+     	         PSW = (byte) value;
+               case 0x04: // FSR
+     	         FSR = (byte) value;
+               case 0x05: // TRISA  TODO: IMPLEMENT!!
+            	 break;
+               case 0x06: // TRISB  TODO: IMPLEMENT!!
+            	 break;
+               case 0x07: //undefined
+            	 break;
+               case 0x08: //EECON1  TODO: IMPLEMENT!!
+            	 break;
+               case 0x09: //EECON2 read as 0
+            	 break;
+               case 0x0A: //PCLATH
+     	         PCLATH = (byte) value;
+               case 0x0B: //INTCON  TODO: IMPLEMENT!!
+            	   break;
+              }
+          }
+        //General Purpose Registers...
+        else if ((fileRegisterAdress % 128) >= 0x0C)
+          {
+     	   //...in Bank 0
+           if(bankSelection == 0)
+             RAM_BANK_0[fileRegisterAdress % 128] = (short)value;         
+     	  //...in Bank 1
+           if(bankSelection == 1)
+             RAM_BANK_1[fileRegisterAdress % 128] = (short) value;
+          }
       }
     
     //Loads bit0 to bit4 of PCLATH into upper 5 Bits of PC
@@ -259,6 +363,10 @@ public class Pic16F84Registers {
     //Erasing content of the Instruction-Register e.g. as part of goto-instructions
     static void flushInstructionRegister()
       {INSTRUCTION_REGISTER = -1;}
+    
+    //Gets the bank-bit to select the data-memory bank used in any instruction
+    static int getBank()
+      {return ((PSW & 0b00100000) >> 5);}
 	
     
     
@@ -278,6 +386,9 @@ public class Pic16F84Registers {
 		  case "Z_FLAG":
 			  PSW = (byte) (PSW | 0b00000100);
 			  break;
+		  case "RP0":
+			  PSW = (byte) (PSW | 0b00100000);
+			  break;
 		 }
 	  }
 	
@@ -294,6 +405,9 @@ public class Pic16F84Registers {
 			  break;
 		  case "Z_FLAG":
 			  PSW = (byte) (PSW & 0b11111011);
+			  break;
+		  case "RP0":
+			  PSW = (byte) (PSW & 0b11011111);
 			  break;
 		 }
 	  }
@@ -356,6 +470,7 @@ public class Pic16F84Registers {
 	
 	/* >>> PRINTING RAM, ROM AND STACK <<< */
 	
+	//Prints program memory
 	static void printProgramMemory()
 	  {
 	   System.out.println(">>> Content of the Program-Memory");
@@ -363,6 +478,21 @@ public class Pic16F84Registers {
 		   System.out.println(i + ". " + String.format("%2X", PROGRAM_MEMORY[i]) + "h");
 	  }
 	
+	//prints data memory
+	static void printDataMemory()
+	  {
+	   System.out.println(">>> Content of the Data-Memory: Bank 0");
+	   for(int i = 0; i < RAM_BANK_0.length; i++)
+		   System.out.println(i + ". " + String.format("%2X", RAM_BANK_0[i]) + "h");
+	   
+	   System.out.println();
+	   
+	   System.out.println(">>> Content of the Data-Memory: Bank 1");
+	   for(int i = 0; i < RAM_BANK_1.length; i++)
+		   System.out.println(i + ". " + String.format("%2X", RAM_BANK_1[i]) + "h");
+	  }
+	
+	//prints stack
 	static void printStack()
 	  {
 		System.out.println(">>> Content of the Stack");
