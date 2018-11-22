@@ -684,7 +684,7 @@ public class CommandExecution {
 	  }
 	
 	//Checks for overflows when adding or subtracting
-	static void checkForOverflow(byte value1, byte value2, String operationType)
+	static void checkForOverflow(int value1, int value2, String operationType)
 	  {
 		switch(operationType)
 		{
@@ -696,7 +696,7 @@ public class CommandExecution {
 		       Pic16F84Registers.reset_Flag("C_FLAG");
 			break;		
 		case "Subtraction":
-			int resultSubtraction = value1 + (~value2+1);
+			int resultSubtraction = value1 + ((~value2+1) & 0x00FF);
 			if(resultSubtraction > 255 )
 		       Pic16F84Registers.set_Flag("C_FLAG");
 		    else
