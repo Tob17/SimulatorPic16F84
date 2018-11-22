@@ -68,55 +68,12 @@ public class Pic16F84Registers {
 		PC = 0;
 		PCL = 0;
 		PCLATH = 0;
-		load5BitPCLATHToPC();
-		loadPCLToPC();
 		PSW = 0;
 		STACKPOINTER = 0;
 		INSTRUCTION_REGISTER = -1;
 		FSR = 0;
 	}
 
-
-//TODO: FSR Finish up
-	/* Notes
-	 * The GPR addresses in bank 1 are mapped to addresses in bank 0. As an example, addressing location 0Ch or 8Ch will access the same GPR.
-	 * The 64 bytes of data EEPROM memory have the address range 0h-3Fh.
-	 * 
-	 */
-	
-	static Map<Integer, Byte> FSRMap = new HashMap<Integer, Byte>();
-	static Integer FSRPointer = 0;	// Act as Pointer 
-	static {
-		// Examples Register files
-		FSRMap.put(1, (byte)0x10);	// Register file 1
-		FSRMap.put(2, (byte)0x0A);	// Register file 2
-	}
-	/* >>> REGISTER-METHODS <<< */
-	
-	// Get value for one specific position
-	static byte getDateInIndirectAddresse(int FSRPointerPosition) {
-		return FSRMap.get(FSRPointer);
-	}
-			
-	// Get value for current position
-	static byte getDateInIndirectAddresse() {
-		return FSRMap.get(FSRPointer);
-	}
-	
-	// Increase pointer position by 1
-	static void increaseFSR() {
-		++FSRPointer;
-	}
-	
-	// Add new register File
-	static void addRegisterFile() {
-		short maskLocationSelect = 0b01111111;
-		Set<Integer> keyset = FSRMap.keySet();
-		int higestKeyset = Collections.max(keyset);	
-		byte value =(byte) (FSR & maskLocationSelect);
-		FSRMap.put(higestKeyset+1, value);
-	}
-	//----------------------------------------------
 	
 	static void settingProgramPage(int pageNumber)
 	{
@@ -158,12 +115,13 @@ public class Pic16F84Registers {
 		}
 	}
 
+	
 	//Accesses Data-Registers either in Bank 0 or Bank 1
-	static int readFileRegisterValue(byte fileRegisterAdress, byte bankSelection)
-	{
+	static int readFileRegisterValue(int fileRegisterAdress, int bankSelection)
+	  {
 		//Special Function Registers...
 		if((fileRegisterAdress % 128) < 0x0C && (fileRegisterAdress % 128) >= 0x00)
-		{   
+		  {   
 			//...in Bank 0
 			if(bankSelection == 0)
 				switch(fileRegisterAdress % 128)
@@ -228,25 +186,26 @@ public class Pic16F84Registers {
 				}
 		} 
 		//General Purpose Registers...
-		else if ((fileRegisterAdress % 128) >= 0x0C)
-		{
-			//...in Bank 0
-			if(bankSelection == 0)
+		else if ((fileRegisterAdress % 128) >= 0x0C && (fileRegisterAdress % 128) <= 0x4F)
+		  {
+			//...always accessed from Bank 0 (Bank 1 is identical to Bank 0) 
 				return RAM_BANK_0[fileRegisterAdress % 128];
-			//...in Bank 1
-			if(bankSelection == 1)
-				return RAM_BANK_1[fileRegisterAdress % 128];
-		}
-
+		  }
+		else
+		  {
+			System.out.println(">>>FATAL ERRROR: Tried to access non implemented RAM!");
+		  }
+		
 		return -1;   	
 	}
+	
 
 	//Accesses Data-Registers either in Bank 0 or Bank 1
-	static void writeFileRegisterValue(int fileRegisterAdress, byte bankSelection, int value)
-	{
+	static void writeFileRegisterValue(int fileRegisterAdress, int bankSelection, int value)
+	  {
 		//Special Function Registers...
 		if((fileRegisterAdress % 128) < 0x0C && (fileRegisterAdress % 128) >= 0x00)
-		{
+		  {
 			//...in Bank 0
 			if(bankSelection == 0)
 				switch(fileRegisterAdress % 128)
@@ -257,6 +216,7 @@ public class Pic16F84Registers {
 					break;
 				case 0x02: // PCL
 					PCL = (byte) value;
+					break;
 				case 0x03: // STATUS
 					PSW = (byte) value;
 				case 0x04: // FSR
@@ -307,17 +267,36 @@ public class Pic16F84Registers {
 				}
 		}
 		//General Purpose Registers...
-		else if ((fileRegisterAdress % 128) >= 0x0C)
-		{
-			//...in Bank 0
-			if(bankSelection == 0)
+		else if ((fileRegisterAdress % 128) >= 0x0C && (fileRegisterAdress % 128) <= 0x4F)
+		  {
+			//...always accessed from Bank 0 (Bank 1 is identical to Bank 0) 
 				RAM_BANK_0[fileRegisterAdress % 128] = (short)value;         
-			//...in Bank 1
-			if(bankSelection == 1)
-				RAM_BANK_1[fileRegisterAdress % 128] = (short) value;
-		}
+		  }
+		else
+		  {
+			System.out.println(">>>FATAL ERRROR: Tried to access non implemented RAM!");
+		  }
+	}
+	
+	//Get the lower 7 Bits of FSR if indirekt adressing is used
+	static int getIndirectAdressFromFSR()
+	{
+	    return (FSR & 0b01111111);
+	}
+	
+	//Get Bankselection-Bit from FSR
+	static int getBankBitFromFSR()
+	{
+	    return (FSR & 0b10000000);
+	}
+	
+	//Get the RP0-Bit from PSW
+	static int getRP0Bit()
+	{
+	    return (PSW & 0b00001000);
 	}
 
+	
 	//Loads bit0 to bit4 of PCLATH into upper 5 Bits of PC
 	static void load5BitPCLATHToPC()
 	{
@@ -407,9 +386,6 @@ public class Pic16F84Registers {
 	static void flushInstructionRegister()
 	{INSTRUCTION_REGISTER = -1;}
 
-	//Gets the bank-bit to select the data-memory bank used in any instruction
-	static int getBank()
-	{return ((PSW & 0b00100000) >> 5);}
 
 
 
@@ -454,6 +430,10 @@ public class Pic16F84Registers {
 			break;
 		}
 	}
+	
+	//Gets the bank-bit to select the data-memory bank used in any instruction
+	static int getBank()
+	{return ((PSW & 0b00100000) >> 5);}
 
 
 
