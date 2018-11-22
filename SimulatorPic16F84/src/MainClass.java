@@ -11,9 +11,9 @@ public class MainClass {
 		System.out.println("====================================================================");
 
 		//SimulatorGUI.initFrame();   
-		//Simulator simulator = new Simulator();
-		//simulator.initSimulator("./src/LSTFiles/TPicSim3.LST", 0, 20); //(file path, page number, number of CPU-Cycles)
-		//simulator.startSimulator();
+		Simulator simulator = new Simulator();
+		simulator.initSimulator("./src/LSTFiles/TPicSim1.LST", 0, 20); //(file path, page number, number of CPU-Cycles)
+		simulator.startSimulator();
 
 	}
 

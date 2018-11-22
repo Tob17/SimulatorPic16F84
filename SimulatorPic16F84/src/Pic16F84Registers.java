@@ -48,12 +48,12 @@ public class Pic16F84Registers {
 	static short[] STACK = new short[8];
 	// 8 Level Stack with 13 Bit PC each
 
-	static short[] RAM_BANK_0 = new short[128];
+	static byte[] RAM_BANK_0 = new byte[128];
 	// 128 1-byte-file-Registers in bank 0
 	// 116 of which are general purpose registers
 	// 12 of which are special function registers
 
-	static short[] RAM_BANK_1 = new short[128];
+	static byte[] RAM_BANK_1 = new byte[128];
 	// 128 1-byte-file-Registers in bank 1
 	// 116 of which are general purpose registers
 	// 12 of which are special function registers
@@ -270,7 +270,7 @@ public class Pic16F84Registers {
 		else if ((fileRegisterAdress % 128) >= 0x0C && (fileRegisterAdress % 128) <= 0x4F)
 		  {
 			//...always accessed from Bank 0 (Bank 1 is identical to Bank 0) 
-				RAM_BANK_0[fileRegisterAdress % 128] = (short)value;         
+				RAM_BANK_0[fileRegisterAdress % 128] = (byte)value;         
 		  }
 		else
 		  {
@@ -507,12 +507,6 @@ public class Pic16F84Registers {
 		System.out.println(">>> Content of the Data-Memory: Bank 0");
 		for(int i = 0; i < RAM_BANK_0.length; i++)
 			System.out.println(i + ". " + String.format("%2X", RAM_BANK_0[i]) + "h");
-
-		System.out.println();
-
-		System.out.println(">>> Content of the Data-Memory: Bank 1");
-		for(int i = 0; i < RAM_BANK_1.length; i++)
-			System.out.println(i + ". " + String.format("%2X", RAM_BANK_1[i]) + "h");
 	}
 
 	//prints stack
