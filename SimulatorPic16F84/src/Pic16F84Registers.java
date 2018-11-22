@@ -1,14 +1,6 @@
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 public class Pic16F84Registers {
 
-	/* TODO: Adding every register available in the Pic16F84 */
-
-
+	
 	/* >>> REGISTERS <<< */
 
 	static byte W_REGISTER;
@@ -40,6 +32,7 @@ public class Pic16F84Registers {
 	// bit 0-7 = location select
 
 
+	
 	/* >>> RAM, ROM  AND STACK <<< */
 
 	static short[] PROGRAM_MEMORY = new short[8192];
@@ -59,9 +52,11 @@ public class Pic16F84Registers {
 	// 12 of which are special function registers
 
 
+	
 
 	/* >>> INIT REGISTERS <<< */
 
+	// Initializes each register with 0
 	static void initRegisters()
 	{
 		W_REGISTER = 0;
@@ -75,6 +70,10 @@ public class Pic16F84Registers {
 	}
 
 	
+	
+	/* >>> RAM, ROM  AND STACK - Methods <<< */
+	
+	// Sets the Program-Memory-Segment used to store our list of instructions
 	static void settingProgramPage(int pageNumber)
 	{
 		switch(pageNumber)
@@ -115,7 +114,6 @@ public class Pic16F84Registers {
 		}
 	}
 
-	
 	//Accesses Data-Registers either in Bank 0 or Bank 1
 	static int readFileRegisterValue(int fileRegisterAdress, int bankSelection)
 	  {
@@ -192,14 +190,12 @@ public class Pic16F84Registers {
 				return RAM_BANK_0[fileRegisterAdress % 128];
 		  }
 		else
-		  {
 			System.out.println(">>>FATAL ERRROR: Tried to access non implemented RAM!");
-		  }
 		
+		//If no register has been addressed
 		return -1;   	
 	}
 	
-
 	//Accesses Data-Registers either in Bank 0 or Bank 1
 	static void writeFileRegisterValue(int fileRegisterAdress, int bankSelection, int value)
 	  {
@@ -273,10 +269,12 @@ public class Pic16F84Registers {
 				RAM_BANK_0[fileRegisterAdress % 128] = (byte)value;         
 		  }
 		else
-		  {
-			System.out.println(">>>FATAL ERRROR: Tried to access non implemented RAM!");
-		  }
+		  System.out.println(">>>FATAL ERRROR: Tried to access non implemented RAM!");
 	}
+	
+	
+	
+	/* >>> Bit - Operation - Methods <<< */
 	
 	//Get the lower 7 Bits of FSR if indirekt adressing is used
 	static int getIndirectAdressFromFSR()
@@ -287,15 +285,14 @@ public class Pic16F84Registers {
 	//Get Bankselection-Bit from FSR
 	static int getBankBitFromFSR()
 	{
-	    return (FSR & 0b10000000);
+	    return ((FSR & 0b10000000) >> 7);
 	}
 	
-	//Get the RP0-Bit from PSW
+	//Get the RP0-Bank-Selection-Bit from PSW 
 	static int getRP0Bit()
 	{
-	    return (PSW & 0b00001000);
+	    return ((PSW & 0b00100000) >> 5);
 	}
-
 	
 	//Loads bit0 to bit4 of PCLATH into upper 5 Bits of PC
 	static void load5BitPCLATHToPC()
@@ -357,7 +354,6 @@ public class Pic16F84Registers {
 		}    	
 	}
 
-
 	//Loads an 8-Bit ALU-Result into the lower byte of the PC plus adding 5 PCLATH Bits to it
 	static void changePCL(byte aluResult)
 	{
@@ -384,7 +380,9 @@ public class Pic16F84Registers {
 
 	//Erasing content of the Instruction-Register e.g. as part of goto-instructions
 	static void flushInstructionRegister()
-	{INSTRUCTION_REGISTER = -1;}
+	{
+		INSTRUCTION_REGISTER = -1;
+	}
 
 
 
@@ -431,17 +429,7 @@ public class Pic16F84Registers {
 		}
 	}
 	
-	//Gets the bank-bit to select the data-memory bank used in any instruction
-	static int getBank()
-	{return ((PSW & 0b00100000) >> 5);}
-
-	//Resets C, DC and Z-Flags
-	static void resetOperationFlags()
-	{
-		PSW = (byte) (PSW & 0b11111110);
-		PSW = (byte) (PSW & 0b11111101);
-		PSW = (byte) (PSW & 0b11111011);
-	}
+	
 
 	/* >>> PRINTING FLAGS & REGISTERS <<< */
 
@@ -512,7 +500,8 @@ public class Pic16F84Registers {
 	{
 		System.out.println(">>> Content of the Data-Memory: Bank 0");
 		for(int i = 0; i < RAM_BANK_0.length; i++)
-			System.out.println(i + ". " + String.format("%2X", RAM_BANK_0[i]) + "h");
+		   System.out.println(i + ". " + String.format("%2X", RAM_BANK_0[i]) + "h");
+		
 	}
 
 	//prints stack

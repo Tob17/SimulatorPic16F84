@@ -3,9 +3,7 @@ import java.io.IOException;
 public class Simulator {
 	
 	
-	/* TODO: Enable step-by-step-execution */
 	/* TODO: Implement interruption of an execution and dealing with an interupt separativly */
-	/* TODO: Doing wrap-around of PCLATH defined program-memory-pages
 	
 	
 	/* >>> SIMULATOR-VARIABLES <<< */
@@ -56,7 +54,7 @@ public class Simulator {
 	      for(int i = 0; i < amountOfCPUCyclesExecuted; i++)
 	      {
 		     CPU_Cycle();	
-		     //Pic16F84Registers.printDataMemory();
+		     Pic16F84Registers.printDataMemory();
 	      }
 	   
 	  
