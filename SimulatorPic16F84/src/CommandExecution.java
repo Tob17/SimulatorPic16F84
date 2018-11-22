@@ -516,15 +516,15 @@ public class CommandExecution {
 	    		  if(opcAndArguments[1] == 0)
 	    		  {
 	  				System.out.println("SUBWF: " + String.format("%2X", value) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
-	  				checkRegisterForZero((byte)(value - Pic16F84Registers.W_REGISTER));
-	    			Pic16F84Registers.W_REGISTER = (byte)(value - Pic16F84Registers.W_REGISTER);
+	  				checkRegisterForZero((byte)((value - Pic16F84Registers.W_REGISTER)& 0x00FF));
+	    			Pic16F84Registers.W_REGISTER = (byte)((value - Pic16F84Registers.W_REGISTER) & 0x00FF);
 	    		  }
 	    		  // Destination -> File Register
 	    		  else if(opcAndArguments[1] == 1)
 	    		  {
 	  				System.out.println("SUBWF: " + String.format("%2X", value) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");
 	  				checkRegisterForZero((byte)(value - Pic16F84Registers.W_REGISTER));
-	    		    Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)(value - Pic16F84Registers.W_REGISTER));
+	    		    Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)((value - Pic16F84Registers.W_REGISTER)& 0x00FF));
 	    		  }
 	    		  // Destination Error
 	    		  else
@@ -545,20 +545,18 @@ public class CommandExecution {
 	    		  {
 	  				System.out.println("SUBWF: " + String.format("%2X", value) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
 	  				checkRegisterForZero((byte)(value - Pic16F84Registers.W_REGISTER));
-	    			Pic16F84Registers.W_REGISTER = (byte)(value - Pic16F84Registers.W_REGISTER);
+	    			Pic16F84Registers.W_REGISTER = (byte)((value - Pic16F84Registers.W_REGISTER)& 0x00FF);
 	    		  }
 	    		  // Destination -> File Register
 	    		  else if(opcAndArguments[1] == 1)
 	    		  {
 	  			   System.out.println("SUBWF: " + String.format("%2X", value) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");
 	  			   checkRegisterForZero((byte)(value - Pic16F84Registers.W_REGISTER));
-	    		   Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), (byte)(value - Pic16F84Registers.W_REGISTER));
+	    		   Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), (byte)((value - Pic16F84Registers.W_REGISTER)& 0x00FF));
 	    		  }
 	    		  // Destination Error
 	    		  else
 	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
-	    		  
-	 			  checkRegisterForZero((byte)(value - Pic16F84Registers.W_REGISTER));
 	    	  }	    	
 	    	break;
 	    	
@@ -794,11 +792,8 @@ public class CommandExecution {
 			System.out.println("SUBLW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 			System.out.println("SUBLW: " + String.format("%2X", opcAndArguments[1]) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
 			checkRegisterForDigitCarry(opcAndArguments[1],Pic16F84Registers.W_REGISTER, "Subtraction");
-			checkForOverflow((byte)opcAndArguments[1], Pic16F84Registers.W_REGISTER, "Subtraction");
-			//int subtractionResult = (opcAndArguments[1] + (~Pic16F84Registers.W_REGISTER + 1));	
-		  //  if(subtractionResult < 0)
-				//subtractionResult = (~subtractionResult+1);	
-		    Pic16F84Registers.W_REGISTER = (byte)(opcAndArguments[1] - Pic16F84Registers.W_REGISTER); 	
+			checkForOverflow((byte)opcAndArguments[1], Pic16F84Registers.W_REGISTER, "Subtraction");	
+		    Pic16F84Registers.W_REGISTER = (byte)((opcAndArguments[1] - Pic16F84Registers.W_REGISTER)& 0x00FF); 	
 			checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 			
@@ -840,13 +835,13 @@ public class CommandExecution {
 		switch(operationType)
 		{
 		case "Addition":
-			if((value1 & 0b00001111) + (value2 & 0b00001111)  > 0xF)
+			if((value1 & 0x000F) + (value2 & 0x00F)  > 0xF)
 		          Pic16F84Registers.set_Flag("DC_FLAG");
 		        else
 		          Pic16F84Registers.reset_Flag("DC_FLAG");   
 			break;		
 		case "Subtraction":
-			if((value1 & 0b00001111) + ((~value2+1) & 0b00001111)  > 0xF)
+			if((value1 & 0x000F) + ((~value2+1) & 0x000F)  > 0xF)
 		          Pic16F84Registers.set_Flag("DC_FLAG");
 		        else
 		          Pic16F84Registers.reset_Flag("DC_FLAG");   
@@ -863,14 +858,14 @@ public class CommandExecution {
 		switch(operationType)
 		{
 		case "Addition":
-			int resultAdditon = (int)value1 + (int)value2;
+			int resultAdditon = value1 + value2;
 			if(resultAdditon > 255)
 		       Pic16F84Registers.set_Flag("C_FLAG");
 		    else
 		       Pic16F84Registers.reset_Flag("C_FLAG");
 			break;		
 		case "Subtraction":
-			int resultSubtraction = (value1 & 0xFF) + ((~value2+1) & 0x00FF);
+			int resultSubtraction = (value1 & 0x00FF) + ((~value2+1) & 0x00FF);
 			if(resultSubtraction > 255 )
 		       Pic16F84Registers.set_Flag("C_FLAG");
 		    else

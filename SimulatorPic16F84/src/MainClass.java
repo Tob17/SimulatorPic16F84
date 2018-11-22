@@ -12,7 +12,7 @@ public class MainClass {
 
 		//SimulatorGUI.initFrame();   
 		Simulator simulator = new Simulator();
-		simulator.initSimulator("./src/LSTFiles/TPicSim101.LST", 0, 30); //(file path, page number, number of CPU-Cycles)
+		simulator.initSimulator("./src/LSTFiles/TPicSim3.LST", 0, 30); //(file path, page number, number of CPU-Cycles)
 		simulator.startSimulator();
 	}
 
