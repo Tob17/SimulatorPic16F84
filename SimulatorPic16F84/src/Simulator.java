@@ -56,7 +56,7 @@ public class Simulator {
 	      for(int i = 0; i < amountOfCPUCyclesExecuted; i++)
 	      {
 		     CPU_Cycle();	
-		     Pic16F84Registers.printDataMemory();
+		     //Pic16F84Registers.printDataMemory();
 	      }
 	   
 	  

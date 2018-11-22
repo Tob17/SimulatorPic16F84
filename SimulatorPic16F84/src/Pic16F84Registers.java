@@ -435,7 +435,13 @@ public class Pic16F84Registers {
 	static int getBank()
 	{return ((PSW & 0b00100000) >> 5);}
 
-
+	//Resets C, DC and Z-Flags
+	static void resetOperationFlags()
+	{
+		PSW = (byte) (PSW & 0b11111110);
+		PSW = (byte) (PSW & 0b11111101);
+		PSW = (byte) (PSW & 0b11111011);
+	}
 
 	/* >>> PRINTING FLAGS & REGISTERS <<< */
 
