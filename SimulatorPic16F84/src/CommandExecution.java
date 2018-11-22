@@ -14,12 +14,11 @@ public class CommandExecution {
 	   
 	   Pic16F84Registers.incrementPC(); // inkrementing PC as part of the execution!
 	   
-	   //Chooses instruction from list below based on content of opcAndArguments[0] which holds the OPC
-	   	      int additionResult = 0;
-	      int subtractionResult = 0;
-	      
+	   //Chooses instruction from list below based on content of opcAndArguments[0] which holds the OPC	      
 	   switch(opcAndArguments[0])
 	     { 	
+	   
+	   
 	      case 0x0700: // ADDWF (W or File Register(d-Bit) = W + File Register)    
 			  System.out.println("ADDWF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 	    	  // Direct Addressing
@@ -28,30 +27,26 @@ public class CommandExecution {
 	    		  // Fetch value directly from File Register
 	    		  byte value = (byte) Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit());
 
-	    		  //Execute Operation (Additon)
+	    		  //Execute Operation (Addition)
 	  		      checkRegisterForDigitCarry(value, Pic16F84Registers.W_REGISTER, "Addition");
 	  		      checkForOverflow(value, Pic16F84Registers.W_REGISTER, "Addition"); 
-	  			  additionResult = (byte)(value + Pic16F84Registers.W_REGISTER); 
-	  			  if(additionResult > 255)
-	  			     additionResult -= 255;
+    			  checkRegisterForZero((byte)(value + Pic16F84Registers.W_REGISTER));
 	  			
 	    		  // Destination -> W_Register
 	    		  if(opcAndArguments[1] == 0)
 	    		  {
 		  			  System.out.println("ADDWF: " + String.format("%2X", opcAndArguments[2]) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
-	    			  Pic16F84Registers.W_REGISTER = (byte)additionResult;
+	    			  Pic16F84Registers.W_REGISTER = (byte)(value + Pic16F84Registers.W_REGISTER);
 	    		  }
 	    		  // Destination -> File Register
 	    		  else if(opcAndArguments[1] == 1)
 	    		  {
 		  			  System.out.println("ADDWF: " + String.format("%2X", opcAndArguments[2]) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");	
-	    			  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), additionResult);
+	    			  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)(value + Pic16F84Registers.W_REGISTER));
 	    		  }
 	    		  // Destination Error
 	    		  else
 	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
-	    		  
-	 			  checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 	    	  }
 	    	  // Indirect Addressing
 	    	  else
@@ -60,32 +55,30 @@ public class CommandExecution {
 	    		  byte value = (byte) Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
 	    		  checkRegisterForZero(value); 
 	    		  
-	    		  //Execute Operation (Additon)
+	    		  //Execute Operation (Addition)
 	  		      checkRegisterForDigitCarry(value, Pic16F84Registers.W_REGISTER, "Addition");
 	  		      checkForOverflow(value, Pic16F84Registers.W_REGISTER, "Addition"); 
-	  			  additionResult = (byte)(value + Pic16F84Registers.W_REGISTER); 				  
-	  			  checkRegisterForZero(Pic16F84Registers.W_REGISTER);
+    			  checkRegisterForZero((byte)(value + Pic16F84Registers.W_REGISTER));
 	    		  
 	    		  // Destination -> W_Register
 	    		  if(opcAndArguments[1] == 0)
 	    		  {
 		  			  System.out.println("ADDWF: " + String.format("%2X", opcAndArguments[2]) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
-	    			  Pic16F84Registers.W_REGISTER = (byte)additionResult;
+	    			  Pic16F84Registers.W_REGISTER = (byte)(value + Pic16F84Registers.W_REGISTER);
 	    		  }
 	    		  // Destination -> File Register
 	    		  else if(opcAndArguments[1] == 1)
 	    		  {
 		  			  System.out.println("ADDWF: " + String.format("%2X", opcAndArguments[2]) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");	
-	    			  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), additionResult);
+	    			  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), (byte)(value + Pic16F84Registers.W_REGISTER));
 	    		  }
 	    		  // Destination Error
 	    		  else
 	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
-	    		  
-	 			  checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 	    	  }
 	    	  break;
 	    	
+	    	  
 	      case 0x0500: // ANDWF (W or File Register(d-Bit) = W & File Register)    
 	    	  System.out.println("ANDWF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 	    	  // Direct Addressing
@@ -93,72 +86,135 @@ public class CommandExecution {
 	    	  {
 	    		  // Fetch value directly from File Register
 	    		  byte value = (byte) Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit());
-
-	    		  //Execute Operation (And)
-			      Pic16F84Registers.W_REGISTER = (byte) (Pic16F84Registers.W_REGISTER & opcAndArguments[2]);
-
+	    		  
+	    		  // Execute operation (And)
+	 			  checkRegisterForZero((byte)(Pic16F84Registers.W_REGISTER & value));
 	  			
 	    		  // Destination -> W_Register
 	    		  if(opcAndArguments[1] == 0)
 	    		  {
-		  			  System.out.println("ADDWF: " + String.format("%2X", opcAndArguments[2]) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
-	    			  Pic16F84Registers.W_REGISTER = (byte) (Pic16F84Registers.W_REGISTER & value);;
+		  			  System.out.println("ANDWF: " + String.format("%2X", value) + "h" + " & " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
+	    			  Pic16F84Registers.W_REGISTER = (byte)(Pic16F84Registers.W_REGISTER & value);;
 	    		  }
 	    		  // Destination -> File Register
 	    		  else if(opcAndArguments[1] == 1)
 	    		  {
-		  			  System.out.println("ADDWF: " + String.format("%2X", opcAndArguments[2]) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");	
-	    			  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), additionResult);
+		  			  System.out.println("ANDWF: " + String.format("%2X", value) + "h" + " & " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");	
+	    			  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)(Pic16F84Registers.W_REGISTER & value));
 	    		  }
 	    		  // Destination Error
 	    		  else
 	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
-	    		  
-	 			  checkRegisterForZero(Pic16F84Registers.W_REGISTER);
+	    		 
 	    	  }
 	    	  // Indirect Addressing
 	    	  else
 	    	  {
 	    		  // Fetch value indirectly from File Register
 	    		  byte value = (byte) Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
-	    		  checkRegisterForZero(value); 
 	    		  
-	    		  //Execute Operation (Additon)
-	  		      checkRegisterForDigitCarry(value, Pic16F84Registers.W_REGISTER, "Addition");
-	  		      checkForOverflow(value, Pic16F84Registers.W_REGISTER, "Addition"); 
-	  			  additionResult = (byte)(value + Pic16F84Registers.W_REGISTER); 				  
-	  			  checkRegisterForZero(Pic16F84Registers.W_REGISTER);
+	    		  // Execute operation (And)
+	 			  checkRegisterForZero((byte)(Pic16F84Registers.W_REGISTER & value));
 	    		  
 	    		  // Destination -> W_Register
 	    		  if(opcAndArguments[1] == 0)
 	    		  {
-		  			  System.out.println("ADDWF: " + String.format("%2X", opcAndArguments[2]) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
-	    			  Pic16F84Registers.W_REGISTER = (byte)additionResult;
+		  			  System.out.println("ANDWF: " + String.format("%2X", value) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
+	    			  Pic16F84Registers.W_REGISTER = (byte)(Pic16F84Registers.W_REGISTER & value);
 	    		  }
 	    		  // Destination -> File Register
 	    		  else if(opcAndArguments[1] == 1)
 	    		  {
-		  			  System.out.println("ADDWF: " + String.format("%2X", opcAndArguments[2]) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");	
-	    			  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), additionResult);
+		  			  System.out.println("ANDWF: " + String.format("%2X", value) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");	
+	    			  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), (byte)(Pic16F84Registers.W_REGISTER & value));
 	    		  }
 	    		  // Destination Error
 	    		  else
 	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
-	    		  
-	 			  checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 	    	  } 				      	  
 	        break;
 	        
-	      case 0x0180:
-	    	System.out.println(">>>Not implemented: " + "CLRF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x0180: // CLRF (Set File Register to 0)  
+	          System.out.println("CLRF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	    	  // Direct Addressing
+	    	  if(opcAndArguments[2] != 0)
+	    	  {  
+	    		  // Clearing directly
+		          System.out.println("CLRF" + " Clearing: " + String.format("%2X", opcAndArguments[2]) + "h" + " to 0");
+	    		  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), 0);
+	    		   
+	 			  checkRegisterForZero((byte)Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit()));
+	    	  }
+	    	  // Indirect Addressing
+	    	  else
+	    	  {
+	    		  // Clearing indirectly
+		          System.out.println("CLRF" + " Clearing: " + String.format("%2X", Pic16F84Registers.getIndirectAdressFromFSR()) + "h" + " to 0");
+	    		  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), 0);
+	    		  
+	    		  checkRegisterForZero((byte)Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(),  Pic16F84Registers.getBankBitFromFSR()));
+	    	  } 		 
+	        
 	    	break;
 	    	
 	      case 0x0100:
 	    	System.out.println(">>>Not implemented: " + "CLRW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 	    	break;
 	    	
-	      case 0x0900:
-	    	System.out.println(">>>Not implemented: " + "Not implemented: " + "COMF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x0900: // COMF (Set File Register to its complement)  
+	          System.out.println("COMF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	    	  // Direct Addressing
+	    	  if(opcAndArguments[2] != 0)
+	    	  {  
+	    		  // Fetch Value directly	    		  
+	    		  int value = Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit());
+	    		  
+	    		  // Execute operation (complement)
+	    		  value = (~value);
+	    		  checkRegisterForZero((byte)value);
+	    		  
+	    		  // Destination -> W_Register
+	    		  if(opcAndArguments[1] == 0)
+	    		  {
+	    			  System.out.println("COMF" + " Complement: " + value + " from " +  String.format("%2X", opcAndArguments[2]) + "h" + " to W");
+	    			  Pic16F84Registers.W_REGISTER = (byte)value;
+	    		  }
+	    		  // Destination -> File Register
+	    		  else if(opcAndArguments[1] == 1)
+	    		  {
+	    			  System.out.println("COMF" + " Complement: " + value + " from " +  String.format("%2X", opcAndArguments[2]) + "h" + " to File Register");
+		    		  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), value);
+	    		  }
+	    		  // Destination Error
+	    		  else
+	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
+	    	  }
+	    	  // Indirect Addressing
+	    	  else
+	    	  {
+	    		  // Fetch Value indirectly	    		  
+	    		  int value = Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
+	    		  
+	    		  // Execute operation (complement)
+	    		  value = (~value);
+	    		  checkRegisterForZero((byte)value);
+	    		  
+	    		  // Destination -> W_Register
+	    		  if(opcAndArguments[1] == 0)
+	    		  {
+	    			  System.out.println("COMF" + " Complement: " + value + " from " +  String.format("%2X", Pic16F84Registers.getIndirectAdressFromFSR()) + "h" + " to W");
+	    			  Pic16F84Registers.W_REGISTER = (byte)value;
+	    		  }
+	    		  // Destination -> File Register
+	    		  else if(opcAndArguments[1] == 1)
+	    		  {
+	    			  System.out.println("COMF" + " Complement: " + value + " from " +  String.format("%2X", Pic16F84Registers.getIndirectAdressFromFSR()) + "h" + " to File Register");
+		    		  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), (byte)value);
+	    		  }
+	    		  // Destination Error
+	    		  else
+	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
+	    	  } 	
 	    	break;
 	    	
 	      case 0x0300:
@@ -188,19 +244,19 @@ public class CommandExecution {
 	    	  {
 	    		  // Fetch value directly from File Register
 	    		  byte value = (byte) Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit());
-	    		  checkRegisterForZero(value); 
+	    		  checkRegisterForZero((byte)value); 
 
 	    		  // Destination -> W_Register
 	    		  if(opcAndArguments[1] == 0)
 	    		  {
-	  				  System.out.println("MOVF: " + "Moving " + String.format("%2X", value) + "h" + "to W");
-	    			  Pic16F84Registers.W_REGISTER = value;
+	  				  System.out.println("MOVF: " + "Moving " + String.format("%2X", (byte)value) + "h" + "to W");
+	    			  Pic16F84Registers.W_REGISTER = (byte)value;
 	    		  }
 	    		  // Destination -> File Register
 	    		  else if(opcAndArguments[1] == 1)
 	    		  {
-	  				  System.out.println("MOVF: " + "Moving " + String.format("%2X", value) + "h" + "to File Register");
-	    			  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), value);
+	  				  System.out.println("MOVF: " + "Moving " + String.format("%2X", (byte)value) + "h" + "to File Register");
+	    			  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)value);
 	    		  }
 	    		  // Destination Error
 	    		  else
@@ -211,14 +267,20 @@ public class CommandExecution {
 	    	  {
 	    		  // Fetch value indirectly from File Register
 	    		  byte value = (byte) Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
-	    		  checkRegisterForZero(value); 
+	    		  checkRegisterForZero((byte)value); 
 	    		  
 	    		  // Destination -> W_Register
 	    		  if(opcAndArguments[1] == 0)
-	    			  Pic16F84Registers.W_REGISTER = value;
+	    		  {
+	    			  System.out.println("MOVF: " + "Moving " + String.format("%2X", (byte)value) + "h" + "to W");
+	    			  Pic16F84Registers.W_REGISTER = (byte)value;
+	    		  }
 	    		  // Destination -> File Register
 	    		  else if(opcAndArguments[1] == 1)
-	    			  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), value);
+	    		  {
+	    			  System.out.println("MOVF: " + "Moving " + String.format("%2X", (byte)value) + "h" + "to File Register");
+	    			  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), (byte)value);
+	    		  }
 	    		  // Destination Error
 	    		  else
 	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
@@ -227,7 +289,7 @@ public class CommandExecution {
 	    	
 	      case 0x0080: // MOVWF (Move Value of W_Register to file Register)
 				System.out.println("MOVWF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
-				System.out.println("MOVWF: " + "Moving " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h" + " to File Register" );
+				System.out.println("MOVWF: " + "Moving " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h" + " to " + String.format("%2X", opcAndArguments[2]));
 	    	  // Direct Addressing
 	    	  if(opcAndArguments[2] != 0)
 	    		  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), Pic16F84Registers.W_REGISTER);
@@ -259,58 +321,58 @@ public class CommandExecution {
 	    		  //Execute Operation (Subtraction)
 	  		      checkRegisterForDigitCarry(value, Pic16F84Registers.W_REGISTER, "Subtraction");
 	  		      checkForOverflow(value, Pic16F84Registers.W_REGISTER, "Subtraction"); 
-	  			  subtractionResult = (byte)(value - Pic16F84Registers.W_REGISTER); 
+	  			  int subtractionResult = (byte)(value - Pic16F84Registers.W_REGISTER); 
 	  			  if(subtractionResult < 0)
 	  				subtractionResult = (~subtractionResult+1);
 	  			
 	    		  // Destination -> W_Register
 	    		  if(opcAndArguments[1] == 0)
 	    		  {
-	  				System.out.println("SUBWF: " + String.format("%2X", opcAndArguments[1]) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
+	  				System.out.println("SUBWF: " + String.format("%2X", value) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
 	    			Pic16F84Registers.W_REGISTER = (byte)subtractionResult;
 	    		  }
 	    		  // Destination -> File Register
 	    		  else if(opcAndArguments[1] == 1)
 	    		  {
-	  				System.out.println("SUBWF: " + String.format("%2X", opcAndArguments[1]) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");	
-	    			  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), subtractionResult);
+	  				System.out.println("SUBWF: " + String.format("%2X", value) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");	
+	    		    Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)subtractionResult);
 	    		  }
 	    		  // Destination Error
 	    		  else
 	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
 	    		  
-	    		  checkRegisterForZero(Pic16F84Registers.W_REGISTER);
+	    		  checkRegisterForZero((byte)subtractionResult); 
 	    	  }
 	    	  // Indirect Addressing
 	    	  else
 	    	  {
 	    		  // Fetch value indirectly from File Register
 	    		  byte value = (byte) Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
-	    		  checkRegisterForZero(value); 
 	    		  
-	    		  //Execute Operation (Additon)
+	    		  //Execute Operation (Subtraction)
 	  		      checkRegisterForDigitCarry(value, Pic16F84Registers.W_REGISTER, "Addition");
 	  		      checkForOverflow(value, Pic16F84Registers.W_REGISTER, "Addition"); 
-	  		    subtractionResult = (byte)(value + Pic16F84Registers.W_REGISTER); 				  
-	  			  checkRegisterForZero(Pic16F84Registers.W_REGISTER);
+	  		      int subtractionResult = (byte)(value - Pic16F84Registers.W_REGISTER); 
+	  		      if(subtractionResult < 0)
+	  				subtractionResult = (~subtractionResult+1);
 	    		  
 	    		  // Destination -> W_Register
 	    		  if(opcAndArguments[1] == 0)
 	    		  {
-	  				System.out.println("SUBWF: " + String.format("%2X", opcAndArguments[1]) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
+	  				System.out.println("SUBWF: " + String.format("%2X", value) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W");	
 	    			  Pic16F84Registers.W_REGISTER = (byte)subtractionResult;
 	    		  }
 	    		  // Destination -> File Register
 	    		  else if(opcAndArguments[1] == 1)
 	    		  {
-	  				System.out.println("SUBWF: " + String.format("%2X", opcAndArguments[1]) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");	
-	    			  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), subtractionResult);
+	  				System.out.println("SUBWF: " + String.format("%2X", value) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to File Register");	
+	    			  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), (byte)subtractionResult);
 	    		  }
 	    		  // Destination Error
 	    		  else
 	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
 	    		  
-	 			  checkRegisterForZero(Pic16F84Registers.W_REGISTER);
+	 			  checkRegisterForZero((byte)subtractionResult);
 	    	  }	    	
 	    	break;
 	    	
@@ -343,10 +405,7 @@ public class CommandExecution {
 			System.out.println("ADDLW: " + String.format("%2X", opcAndArguments[1]) + "h" + " + " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );	
 		    checkRegisterForDigitCarry(opcAndArguments[1], Pic16F84Registers.W_REGISTER, "Addition");		    
 			checkForOverflow(opcAndArguments[1], Pic16F84Registers.W_REGISTER, "Addition");
-			additionResult = (opcAndArguments[1] + Pic16F84Registers.W_REGISTER); 	
-			if(additionResult > 255)
-	  		   additionResult -= 255;
-			Pic16F84Registers.W_REGISTER = (byte) additionResult; 		
+			Pic16F84Registers.W_REGISTER = (byte) (opcAndArguments[1] + Pic16F84Registers.W_REGISTER); 		
 			checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 			
@@ -408,11 +467,10 @@ public class CommandExecution {
 			System.out.println("SUBLW: " + String.format("%2X", opcAndArguments[1]) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
 			checkRegisterForDigitCarry(opcAndArguments[1],Pic16F84Registers.W_REGISTER, "Subtraction");
 			checkForOverflow(opcAndArguments[1], Pic16F84Registers.W_REGISTER, "Subtraction");
-			
-			subtractionResult = (opcAndArguments[1] + (~Pic16F84Registers.W_REGISTER + 1));	
+			int subtractionResult = (opcAndArguments[1] + (~Pic16F84Registers.W_REGISTER + 1));	
 		    if(subtractionResult < 0)
 				subtractionResult = (~subtractionResult+1);	
-		    Pic16F84Registers.W_REGISTER = (byte) subtractionResult; 	
+		    Pic16F84Registers.W_REGISTER = (byte)subtractionResult; 	
 			checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 				 
