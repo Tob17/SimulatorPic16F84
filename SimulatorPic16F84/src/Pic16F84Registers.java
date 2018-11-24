@@ -64,11 +64,12 @@ public class Pic16F84Registers {
 		PCL = 0;
 		PCLATH = 0;
 		PSW = 0;
-		STACKPOINTER = 0;
+		STACKPOINTER = -1;
 		INSTRUCTION_REGISTER = -1;
 		FSR = 0;
 	}
 
+	
 	
 	
 	/* >>> RAM, ROM  AND STACK - Methods <<< */
@@ -212,6 +213,7 @@ public class Pic16F84Registers {
 					break;
 				case 0x02: // PCL
 					PCL = (byte) value;
+					loadPCLToPC();
 					break;
 				case 0x03: // STATUS
 					PSW = (byte) value;
@@ -265,11 +267,54 @@ public class Pic16F84Registers {
 		//General Purpose Registers...
 		else if ((fileRegisterAdress % 128) >= 0x0C && (fileRegisterAdress % 128) <= 0x4F)
 		  {
-			//...always accessed from Bank 0 (Bank 1 is identical to Bank 0) 
-				RAM_BANK_0[fileRegisterAdress % 128] = (byte)value;         
+			//...are allways written to in Bank 0 and Bank 1 simultanously
+				RAM_BANK_0[fileRegisterAdress % 128] = (byte)value;    
+				RAM_BANK_1[fileRegisterAdress % 128] = (byte)value; 
 		  }
 		else
 		  System.out.println(">>>FATAL ERRROR: Tried to access non implemented RAM!");
+	}
+	
+	//Increments the stackpointer and sets it to 0 if it exceeds the 8-Level-Stack (circular puffer)
+	static void incrementStackPointer()
+	{
+		STACKPOINTER++;
+		
+		if(STACKPOINTER > 7)
+			STACKPOINTER = 0;
+	}
+	
+	//Decrements the stackpointer and sets it to 7 if it falls below 0 (circular puffer)
+	static void decrementStackPointer()
+	{
+		STACKPOINTER--;
+		
+		if(STACKPOINTER < 0)
+			STACKPOINTER = 7;
+	}
+	
+	//Pushes a value onto the stack
+	static void push(int value)
+	{
+		//Checks if stackpointer is not pointing to a value on the stack yet
+		if(STACKPOINTER == -1)
+		{
+			STACKPOINTER = 0;
+			STACK[STACKPOINTER] = (short)value;
+		}
+		else
+		{
+			incrementStackPointer();
+			STACK[STACKPOINTER] = (short)value;
+		}
+	}
+	
+	//Pops a value from the stack
+	static short pop()
+	{
+		short returnValue = STACK[STACKPOINTER];
+		decrementStackPointer();
+		return returnValue;
 	}
 	
 	
@@ -378,12 +423,6 @@ public class Pic16F84Registers {
 		load2BitPCLATHToPC();
 	}
 
-	//Erasing content of the Instruction-Register e.g. as part of goto-instructions
-	static void flushInstructionRegister()
-	{
-		INSTRUCTION_REGISTER = -1;
-	}
-
 
 
 
@@ -431,6 +470,7 @@ public class Pic16F84Registers {
 	
 	
 
+	
 	/* >>> PRINTING FLAGS & REGISTERS <<< */
 
 	//Prints all flags
@@ -480,6 +520,7 @@ public class Pic16F84Registers {
 		printStackpointer();
 		printFSR();
 		printInstructionRegister();
+		System.out.println("===================================================================="); 
 	}	
 
 
@@ -491,17 +532,28 @@ public class Pic16F84Registers {
 	static void printProgramMemory()
 	{
 		System.out.println(">>> Content of the Program-Memory");
+		System.out.println("===================================================================="); 
 		for(int i = 0; i < PROGRAM_MEMORY.length; i++)
-			System.out.println(i + ". " + String.format("%2X", PROGRAM_MEMORY[i]) + "h");
+		{
+		 System.out.print(i + ". " + String.format("%2X", PROGRAM_MEMORY[i]) + "h" + "      ");
+		 if((i % 10) == 0)
+			 System.out.println();
+		}
+		System.out.println();
 	}
 
 	//prints data memory
 	static void printDataMemory()
 	{
-		System.out.println(">>> Content of the Data-Memory: Bank 0");
-		for(int i = 0; i < RAM_BANK_0.length; i++)
-		   System.out.println(i + ". " + String.format("%2X", RAM_BANK_0[i]) + "h");
-		
+		System.out.println(">>> Content of the Data-Memory in Bank 0 and Bank 1");
+		System.out.println("===================================================================="); 
+		for(int i = 12; i < 80; i++)
+		  {
+		   System.out.print(i + ". " + String.format("%2X", RAM_BANK_0[i]) + "h" + "      ");
+		   if(((i - 11) % 6) == 0)
+			   System.out.println();
+		  }	
+		System.out.println();
 	}
 
 	//prints stack

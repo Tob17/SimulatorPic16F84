@@ -482,8 +482,9 @@ public class CommandExecution {
 	    	  
 	    	/* >-----------------------------------------------------------------------< */
 	    	
-	      case 0x0000:
-	    	System.out.println(">>>Not implemented: " + "NOP" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x0000: //NOP (doing absolutely nothing... but wasting CPU-Cycles)
+	    	System.out.println("NOP" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	    	System.out.println("NOP: Doing nothing for now...");
 	    	break;
 	    	
 	    	/* >-----------------------------------------------------------------------< */
@@ -725,8 +726,13 @@ public class CommandExecution {
 			
 			/* >-----------------------------------------------------------------------< */
 	    	 
-	      case 0x2000:
-	    	System.out.println(">>>Not implemented: " + "CALL" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x2000: //CALL (pushes the PC onto the stack and overwrites it with the value in argument 1
+			System.out.println("CALL" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+			System.out.println("CALL: " + "Calling function at: " + String.format("%2X", opcAndArguments[1]) + "h");
+	    	Pic16F84Registers.push(Pic16F84Registers.PC);
+	    	Pic16F84Registers.PC = (short)opcAndArguments[1];
+	    	Pic16F84Registers.load2BitPCLATHToPC();
+	    	Pic16F84Registers.loadPCToPCL();
 			break;
 			
 			/* >-----------------------------------------------------------------------< */
@@ -740,7 +746,6 @@ public class CommandExecution {
 	      case 0x2800: //GOTO (Jump to adress A1)
 			System.out.println("GOTO" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 			System.out.println("GOTO: " + "Jumping to adress: " + String.format("%2X", opcAndArguments[1]) + "h");
-			Pic16F84Registers.flushInstructionRegister();
 			Pic16F84Registers.computedGOTO((short)opcAndArguments[1]);
 			break;	
 			
@@ -776,8 +781,11 @@ public class CommandExecution {
 			
 			/* >-----------------------------------------------------------------------< */
 			   		
-	      case 0x0008:
-			System.out.println(">>>Not implemented: " + "RETURN" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x0008: //RETURN (returns from a function and pops the saved PC from the stack)
+			System.out.println("RETURN" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+			System.out.println("RETURN: " + "Jumping back to: " + String.format("%2X", Pic16F84Registers.STACK[Pic16F84Registers.STACKPOINTER]) + "h");
+	    	Pic16F84Registers.PC = Pic16F84Registers.pop();
+	    	Pic16F84Registers.loadPCToPCL();
 			break;	
 			
 			/* >-----------------------------------------------------------------------< */

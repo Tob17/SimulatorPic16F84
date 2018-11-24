@@ -54,7 +54,6 @@ public class Simulator {
 	      for(int i = 0; i < amountOfCPUCyclesExecuted; i++)
 	      {
 		     CPU_Cycle();	
-		     Pic16F84Registers.printDataMemory();
 	      }
 	   
 	  
@@ -78,20 +77,23 @@ public class Simulator {
 	   //Execute PC-1 (Pipe 1.)
 	   if(Pic16F84Registers.INSTRUCTION_REGISTER != -1)
 	     {
+		  System.out.println("1.Execute " + String.format("%2X", Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]) + "h" + " from " + "Program-Memory[" + Pic16F84Registers.PC + "]");
+		  System.out.println("====================================================================");  
 	      CommandExecution.execute(Pic16F84Registers.INSTRUCTION_REGISTER);
 		  Pic16F84Registers.printAllFlags();
 		  Pic16F84Registers.printAllRegisters();
+		  Pic16F84Registers.printDataMemory();
 		  System.out.println("====================================================================");  
 	     }
 	   else
 	     {
 		  System.out.println("====================================================================");
-		  System.out.println("Instruction-Register is empty!");  
+		  System.out.println("1.Instruction-Register is empty!");  
 		  System.out.println("====================================================================");  
 	     }
 	   //Fetch PC (Pipe 2.)
 	   Pic16F84Registers.INSTRUCTION_REGISTER = Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]; 
-	   System.out.println("Fetched " + String.format("%2X", Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]) + "h" + " from " + "Program-Memory[" + Pic16F84Registers.PC + "]");  
+	   System.out.println("2.Fetched " + String.format("%2X", Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]) + "h" + " from " + "Program-Memory[" + Pic16F84Registers.PC + "]");  
 	   System.out.println("====================================================================");  
 	  }
 	
