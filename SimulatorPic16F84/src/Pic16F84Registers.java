@@ -1,5 +1,8 @@
 public class Pic16F84Registers {
 
+	/* TODO: Adding Tris-Register and operations */
+	/* TODO: Adding Port-Registers and operations */
+	/* TODO: Adding Option-Register and operations */
 	
 	/* >>> REGISTERS <<< */
 

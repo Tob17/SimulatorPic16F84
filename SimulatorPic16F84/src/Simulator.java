@@ -4,8 +4,11 @@ public class Simulator {
 	
 	
 	/* TODO: Implement interruption of an execution and dealing with an interupt separativly */
+	/* TODO: Implement Breakpoints */
+	/* TODO: Implement Runtime-Counter */
+	/* TODO: Implement Clock-Generator */
 	
-	
+
 	/* >>> SIMULATOR-VARIABLES <<< */
 	
 	boolean programMemoryContainsProgram = false;

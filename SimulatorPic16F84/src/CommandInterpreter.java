@@ -1,21 +1,19 @@
 
 public class CommandInterpreter {
 
-
-	/* TODO: Extract arguments from commands! */
-
-
+	
 	/* >>> DECODE <<< */
 
 	//Takes a command and extracts OPC and arguments (Harvard-Architecture)
 	static int[] decode(int command)
 	{
+		
+		int[] opcAndArguments = new int[3];
 		//Integer-array holding OPC and arguments
 		//opcAndArguments[0]: OPCODE
 		//opcAndArguments[1]: Destination (Argument 1)
 		//opcAndArguments[2]: FSR/Register Address (Argument 2).
 		//opcAndArguments[2] == -1 When OPC has only 1 Argument
-		int[] opcAndArguments = new int[3];
 
 		//Masks for OPC	
 		int maskOperationType =   				0b11000000000000;

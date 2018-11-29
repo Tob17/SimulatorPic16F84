@@ -7,15 +7,19 @@ public class CommandExecution {
 	//Most important routine of Command execution! (does an DECODE-call to CommandInterpreter)
     static void execute(int command)
 	  {
+    	
 	   int[] opcAndArguments = CommandInterpreter.decode(command);
 	   
 	   Pic16F84Registers.incrementPC(); // inkrementing PC as part of the execution!
+	   
 	   
 	   //Chooses instruction from list below based on content of opcAndArguments[0] which holds the OPC	      
 	   switch(opcAndArguments[0])
 	     { 	
 	   
 	                 /* >-----------------------------------------------------------------------< */
+                     /* >----------------Byte-oriented File Register Operations-----------------< */
+                     /* >-----------------------------------------------------------------------< */
 	   
 	      case 0x0700: // ADDWF (W or File Register(d-Bit) = W + File Register)    
 			  System.out.println("ADDWF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -76,7 +80,9 @@ public class CommandExecution {
 	    	  }
 	    	  break;
 	    	  
+	    	  
 	    	  /* >-----------------------------------------------------------------------< */
+	    	  
 	    	  
 	      case 0x0500: // ANDWF (W or File Register(d-Bit) = W & File Register)    
 	    	  System.out.println("ANDWF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -133,7 +139,9 @@ public class CommandExecution {
 	    	  } 				      	  
 	        break;
 	        
+	        
 	        /* >-----------------------------------------------------------------------< */
+	        
 	        
 	      case 0x0180: // CLRF (Set File Register to 0)  
 	          System.out.println("CLRF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -157,7 +165,9 @@ public class CommandExecution {
 	    	  } 		         
 	    	break;
 	    	
-	    	/* >-----------------------------------------------------------------------< */
+	    	
+	    	/* >-------------------
+	    	 * ----------------------------------------------------< */
 	    	
 	      case 0x0100: // CLRF (Set W-Register to 0) 
 	          System.out.println("CLRW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -167,7 +177,9 @@ public class CommandExecution {
 	 		  checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0900: // COMF (Set File Register to its complement)  
 	          System.out.println("COMF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -225,7 +237,9 @@ public class CommandExecution {
 	    	  } 	
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0300: // DECF (Decrement File Register)
 	          System.out.println("DECF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -287,7 +301,9 @@ public class CommandExecution {
 	    	  } 
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0B00: //DECFSZ (Decrements 1 from File Register and skip next instruction if file register value falls to 0)
 				 System.out.println("DECFSZ" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -372,7 +388,9 @@ public class CommandExecution {
 		    	  } 
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0A00: // INCF (Increment File Register)
 	          System.out.println("INCF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -430,7 +448,9 @@ public class CommandExecution {
 	    	  } 
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0F00: //INCFSZ (increment 1 at File Register and skip next instruction if file register value rises to 0)  
 				 System.out.println("INCFSZ" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -514,7 +534,9 @@ public class CommandExecution {
 		    	  } 
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0400: // IORWF (W IOR File Register to  or File Register
 	          System.out.println("IORF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -572,7 +594,9 @@ public class CommandExecution {
 	    	  } 
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0800: // MOVF (Move Register Value to File Register or W_Register)
 				System.out.println("MOVF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -624,8 +648,10 @@ public class CommandExecution {
 	    	  }
 	    	  break;
 	    	  
+	    	  
 	    	  /* >-----------------------------------------------------------------------< */
 	    	
+	    	  
 	      case 0x0080: // MOVWF (Move Value of W_Register to file Register)
 				System.out.println("MOVWF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 				System.out.println("MOVWF: " + "Moving " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h" + " to " + String.format("%2X", opcAndArguments[2]));
@@ -637,14 +663,18 @@ public class CommandExecution {
 	    		  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), Pic16F84Registers.W_REGISTER);
 	    	  break;
 	    	  
+	    	  
 	    	/* >-----------------------------------------------------------------------< */
 	    	
+	    	  
 	      case 0x0000: //NOP (doing absolutely nothing... but wasting CPU-Cycles)
 	    	System.out.println("NOP" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 	    	System.out.println("NOP: Doing nothing for now...");
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0D00: // RLF (Shift value of file register left once and storing left-falling-off bit in C-Flag)
 		    System.out.println("RLF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -722,7 +752,9 @@ public class CommandExecution {
 	    	  }
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0C00: //RRF (Shift value of file register right once and storing right-falling-off bit in C-Flag)
 			    System.out.println("RRF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -798,7 +830,9 @@ public class CommandExecution {
 		    	  }
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0200: // SUBWF (W or File Register(d-Bit) = File Register - W)    
 				System.out.println("SUBWF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -860,7 +894,9 @@ public class CommandExecution {
 	    	  }	    	
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0E00: // SWAPF (Swaps lower 4 Bit with highter 4 Bit)
 	    	  // Direct Addressing
@@ -921,7 +957,9 @@ public class CommandExecution {
 	    	  }	  
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x0600: // XORWF (W XOR File Register to W or File Register)
 	          System.out.println("XOR" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -979,7 +1017,10 @@ public class CommandExecution {
 	    	  } 
 	    	break;
 	    	
-	    	/* >-----------------------------------------------------------------------< */
+	    	
+            /* >-----------------------------------------------------------------------< */
+            /* >----------------Bit-oriented File Register Operations------------------< */
+            /* >-----------------------------------------------------------------------< */
 	    
 	      case 0x1000: //BCF (clears 1 bit selected by opcAndAgument[1] in indirect File Register or directly in opcAndArguments[2])
 			 System.out.println("BCF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -1010,7 +1051,9 @@ public class CommandExecution {
 	    	  } 
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x1400:  //BSF (set 1 bit selected by opcAndAgument[1] in indirect File Register or directly in opcAndArguments[2])
 			 System.out.println("BSF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -1041,7 +1084,9 @@ public class CommandExecution {
 	    	  } 
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x1800: //BTFSC (Skip the next instruction if the bit is set to 0 selected by opcAndArguments[1] from the File Register - Value (direct or indirect), or continue normally if it´s set to 1)
 				 System.out.println("BTFSC" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -1099,7 +1144,9 @@ public class CommandExecution {
 		    	  } 
 	    	break;
 	    	
+	    	
 	    	/* >-----------------------------------------------------------------------< */
+	    	
 	    	
 	      case 0x1C00: //BTFSS (Skip the next instruction if the bit is set to 1 selected by opcAndArguments[1] from the File Register - Value (direct or indirect), or continue normally if it´s set to 0)	  
 				 System.out.println("BTFSS" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -1160,7 +1207,10 @@ public class CommandExecution {
 		    	  } 
 	        break;
 	        
-	        /* >-----------------------------------------------------------------------< */
+	        
+            /* >-----------------------------------------------------------------------< */
+            /* >----------------Literal and Control Operations-----------------< */
+            /* >-----------------------------------------------------------------------< */
 	    	 
 	      case 0x3E00: //ADDLW (A1 + W to W)
 			System.out.println("ADDLW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -1171,7 +1221,9 @@ public class CommandExecution {
 			checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 			
+			
 			/* >-----------------------------------------------------------------------< */
+			
 			
 	      case 0x3900: //ANDLW (A1 AND W to W)
 			System.out.println("ANDLW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -1180,8 +1232,10 @@ public class CommandExecution {
 			checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	 
 			
+			
 			/* >-----------------------------------------------------------------------< */
 	    	 
+			
 	      case 0x2000: //CALL (pushes the PC onto the stack and overwrites it with the value in argument 1
 			System.out.println("CALL" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 			System.out.println("CALL: " + "Calling function at: " + String.format("%2X", opcAndArguments[1]) + "h");
@@ -1191,13 +1245,17 @@ public class CommandExecution {
 	    	Pic16F84Registers.loadPCToPCL();
 			break;
 			
+			
 			/* >-----------------------------------------------------------------------< */
 	     
+			
 	      case 0x0064:
 	    	System.out.println(">>>Not implemented: " + "CLRWDT" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 			break;
 			
+			
 			/* >-----------------------------------------------------------------------< */
+			
 			
 	      case 0x2800: //GOTO (Jump to adress A1)
 			System.out.println("GOTO" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -1205,7 +1263,9 @@ public class CommandExecution {
 			Pic16F84Registers.computedGOTO((short)opcAndArguments[1]);
 			break;	
 			
+			
 			/* >-----------------------------------------------------------------------< */
+			
 			
 	      case 0x3800: //IORLW (A1 IOR W to W)
 			System.out.println("IORLW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -1214,7 +1274,9 @@ public class CommandExecution {
 		    checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 			
+			
 			/* >-----------------------------------------------------------------------< */   	
+			
 			
 	      case 0x3000: //MOVLW (Move A1 to W)
 			System.out.println("MOVLW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
@@ -1223,14 +1285,18 @@ public class CommandExecution {
 		    checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 			
+			
 			/* >-----------------------------------------------------------------------< */
 	     
+			
 	      case 0x0009:
 	        System.out.println(">>>Not implemented: " + "RETFIE" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 			break;	
 			
+			
 			/* >-----------------------------------------------------------------------< */
 			   	
+			
 	      case 0x3400: //RETLW (returns from a function and pops the saved PC from the stack and additionally writes opcAndArguments[1] to W)
 			System.out.println("RETLW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 			System.out.println("RETLW: " + "Jumping back to: " + String.format("%2X", Pic16F84Registers.STACK[Pic16F84Registers.STACKPOINTER]) + "h" + "and moving " + String.format("%2X", opcAndArguments[1]) + "to W");
@@ -1239,8 +1305,10 @@ public class CommandExecution {
 	    	Pic16F84Registers.W_REGISTER = (byte)opcAndArguments[1];
 			break;	
 			
+			
 			/* >-----------------------------------------------------------------------< */
 			   		
+			
 	      case 0x0008: //RETURN (returns from a function and pops the saved PC from the stack)
 			System.out.println("RETURN" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 			System.out.println("RETURN: " + "Jumping back to: " + String.format("%2X", Pic16F84Registers.STACK[Pic16F84Registers.STACKPOINTER]) + "h");
@@ -1248,14 +1316,18 @@ public class CommandExecution {
 	    	Pic16F84Registers.loadPCToPCL();
 			break;	
 			
+			
 			/* >-----------------------------------------------------------------------< */
 			   	
+			
 	      case 0x0063:
 			System.out.println(">>>Not implemented: " + "SLEEP" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 			break;	
 			
+			
 			/* >-----------------------------------------------------------------------< */
 			   	
+			
 	      case 0x3C00: //SUBLW (A1 - W to W)
 			System.out.println("SUBLW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 			System.out.println("SUBLW: " + String.format("%2X", opcAndArguments[1]) + "h" + " - " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
@@ -1265,8 +1337,10 @@ public class CommandExecution {
 			checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 			
+			
 			/* >-----------------------------------------------------------------------< */
 				 
+			
 		  case 0x3A00: //XORLW (A1 XOR W to W)
 			System.out.println("XORLW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 			System.out.println("XORLW: " + String.format("%2X", opcAndArguments[1]) + "h" + " XOR " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h"  + " to W" );
@@ -1274,11 +1348,16 @@ public class CommandExecution {
 		    checkRegisterForZero(Pic16F84Registers.W_REGISTER);
 			break;	
 			
-			/* >-----------------------------------------------------------------------< */
+			
+            /* >-----------------------------------------------------------------------< */
+            /* >-------------------------Undefined Operation---------------------------< */
+            /* >-----------------------------------------------------------------------< */
 			  
+			
 		  case -1:
 		    System.out.println(">>>Not implemented: Undefined instruction found!");
 			break;
+			
 			
 			/* >-----------------------------------------------------------------------< */
 		 } 	

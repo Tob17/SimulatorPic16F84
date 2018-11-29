@@ -4,6 +4,10 @@ import java.awt.*;
 
 public class SimulatorGUI extends JPanel {
 	
+	/* TODO: Implement Breakpoints */
+	/* TODO: Implement Runtime-Counter */
+	/* TODO: Implement Clock-Generator */
+	
 	
   /* >>> Class-Methods <<< */
 
