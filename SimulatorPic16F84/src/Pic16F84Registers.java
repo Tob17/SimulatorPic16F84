@@ -140,7 +140,7 @@ public class Pic16F84Registers {
 				case 0x06: // PORTB  TODO: IMPLEMENT!!
 					return -1;
 				case 0x07: //undefined
-					return -1;
+					return 0;
 				case 0x08: //EEDATA  TODO: IMPLEMENT!!
 					return -1;
 				case 0x09: //EEADR   TODO: IMPLEMENT!!

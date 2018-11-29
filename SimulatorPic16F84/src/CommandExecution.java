@@ -289,8 +289,87 @@ public class CommandExecution {
 	    	
 	    	/* >-----------------------------------------------------------------------< */
 	    	
-	      case 0x0B00:
-	    	System.out.println(">>>Not implemented: " + "DECFSZ" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x0B00: //DECFSZ (Decrements 1 from File Register and skip next instruction if file register value falls to 0)
+				 System.out.println("DECFSZ" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+		    	 // Direct Addressing
+		    	 if(opcAndArguments[2] != 0)
+		    	  {  
+		    		  System.out.println("DECFSZ: " + "decrement value from " + String.format("%2X", opcAndArguments[2]));	
+		    		   
+		    		  // Fetch Value directly	    		  
+		    		  byte value = (byte)Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit());
+		    		 
+		    		  // Execute operation (decrement and skip next instruction if 0) 
+		    		  value--;
+		    		  
+		    		  if(value == 0)
+		    		  {
+		    		   System.out.println("DECFSZ: " + "Executing NOP and skip next instruction!");	
+	    			   System.out.println("====================================================================");  
+	    			   CommandExecution.execute(0x0000);
+	    			   System.out.println("====================================================================");  
+		    		  }
+		    		  else
+		    		  {
+		    		   System.out.println("DECFSZ: " + "Going on normally...");		  
+		    		  }			
+
+		    		  // Destination -> W_Register
+		    		  if(opcAndArguments[1] == 0)
+		    		  {
+		    			  System.out.println("DECFSZ" + " storing " + String.format("%2X", value) + "h" + " to W");
+		    			  Pic16F84Registers.W_REGISTER = (byte)value;
+		    		  }
+		    		  // Destination -> File Register
+		    		  else if(opcAndArguments[1] == 1)
+		    		  {
+		    			  System.out.println("DECFSZ" + " storing " + String.format("%2X", value) + "h" + " to File Register" + String.format("%2X", opcAndArguments[2]));
+			    		  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)value);
+		    		  }
+		    		  // Destination Error
+		    		  else
+		    			  System.out.println(">>>ERROR: Destination Bit Unclear");
+		    		  
+		    	  }
+		    	  // Indirect Addressing
+		    	  else
+		    	  {
+		    		  System.out.println("DECFSZ: " + "decrement value from " + String.format("%2X", Pic16F84Registers.getIndirectAdressFromFSR()));
+		    		  
+		    		  // Fetch Value indirectly	    		  
+		    		  int value = Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
+		    		  
+		    		  // Execute operation (decrement and skip next instruction if 0) 
+		    		  value--;
+		    		  
+		    		  if(value == 0)
+		    		  {
+		    		   System.out.println("DECFSZ: " + "Executing NOP and skip next instruction!");	
+	    			   System.out.println("====================================================================");  
+	    			   CommandExecution.execute(0x0000);
+	    			   System.out.println("====================================================================");  
+		    		  }
+		    		  else
+		    		  {
+		    		   System.out.println("DECFSZ: " + "Going on normally...");		  
+		    		  }			
+
+		    		  // Destination -> W_Register
+		    		  if(opcAndArguments[1] == 0)
+		    		  {
+		    			  System.out.println("DECFSZ" + " storing " + String.format("%2X", value) + "h" + " to W");
+		    			  Pic16F84Registers.W_REGISTER = (byte)value;
+		    		  }
+		    		  // Destination -> File Register
+		    		  else if(opcAndArguments[1] == 1)
+		    		  {
+		    			  System.out.println("DECFSZ" + " storing " + String.format("%2X", value) + "h" + " to File Register" + String.format("%2X", Pic16F84Registers.getIndirectAdressFromFSR()));
+			    		  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)value);
+		    		  }
+		    		  // Destination Error
+		    		  else
+		    			  System.out.println(">>>ERROR: Destination Bit Unclear");
+		    	  } 
 	    	break;
 	    	
 	    	/* >-----------------------------------------------------------------------< */
@@ -353,8 +432,86 @@ public class CommandExecution {
 	    	
 	    	/* >-----------------------------------------------------------------------< */
 	    	
-	      case 0x0F00:
-	    	System.out.println(">>>Not implemented: " + "INCFSZ" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x0F00: //INCFSZ (increment 1 at File Register and skip next instruction if file register value rises to 0)  
+				 System.out.println("INCFSZ" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+		    	 // Direct Addressing
+		    	 if(opcAndArguments[2] != 0)
+		    	  {  
+		    		  System.out.println("INCFSZ: " + "increment value at " + String.format("%2X", opcAndArguments[2]));	
+		    		   
+		    		  // Fetch Value directly	    		  
+		    		  byte value = (byte)Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit());
+		    		 
+		    		  // Execute operation (decrement and skip next instruction if 0) 
+		    		  value++;
+		    		  
+		    		  if(value == 0)
+		    		  {
+		    		   System.out.println("INCFSZ: " + "Executing NOP and skip next instruction!");	
+	    			   System.out.println("====================================================================");  
+	    			   CommandExecution.execute(0x0000);
+	    			   System.out.println("====================================================================");  
+		    		  }
+		    		  else
+		    		  {
+		    		   System.out.println("INCFSZ: " + "Going on normally...");		  
+		    		  }			
+
+		    		  // Destination -> W_Register
+		    		  if(opcAndArguments[1] == 0)
+		    		  {
+		    			  System.out.println("INCFSZ" + " storing " + String.format("%2X", value) + "h" + " to W");
+		    			  Pic16F84Registers.W_REGISTER = (byte)value;
+		    		  }
+		    		  // Destination -> File Register
+		    		  else if(opcAndArguments[1] == 1)
+		    		  {
+		    			  System.out.println("INCFSZ" + " storing " + String.format("%2X", value) + "h" + " to File Register" + String.format("%2X", opcAndArguments[2]));
+			    		  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)value);
+		    		  }
+		    		  // Destination Error
+		    		  else
+		    			  System.out.println(">>>ERROR: Destination Bit Unclear");  
+		    	  }
+		    	  // Indirect Addressing
+		    	  else
+		    	  {
+		    		  System.out.println("INCFSZ: " + "increment value at " + String.format("%2X", Pic16F84Registers.getIndirectAdressFromFSR()));
+		    		  
+		    		  // Fetch Value indirectly	    		  
+		    		  int value = Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
+		    		  
+		    		  // Execute operation (decrement and skip next instruction if 0) 
+		    		  value++;
+		    		  
+		    		  if(value == 0)
+		    		  {
+		    		   System.out.println("INCFSZ: " + "Executing NOP and skip next instruction!");	
+	    			   System.out.println("====================================================================");  
+	    			   CommandExecution.execute(0x0000);
+	    			   System.out.println("====================================================================");  
+		    		  }
+		    		  else
+		    		  {
+		    		   System.out.println("INCFSZ: " + "Going on normally...");		  
+		    		  }			
+
+		    		  // Destination -> W_Register
+		    		  if(opcAndArguments[1] == 0)
+		    		  {
+		    			  System.out.println("INCFSZ" + " storing " + String.format("%2X", value) + "h" + " to W");
+		    			  Pic16F84Registers.W_REGISTER = (byte)value;
+		    		  }
+		    		  // Destination -> File Register
+		    		  else if(opcAndArguments[1] == 1)
+		    		  {
+		    			  System.out.println("INCFSZ" + " storing " + String.format("%2X", value) + "h" + " to File Register" + String.format("%2X", Pic16F84Registers.getIndirectAdressFromFSR()));
+			    		  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)value);
+		    		  }
+		    		  // Destination Error
+		    		  else
+		    			  System.out.println(">>>ERROR: Destination Bit Unclear");
+		    	  } 
 	    	break;
 	    	
 	    	/* >-----------------------------------------------------------------------< */
@@ -489,14 +646,156 @@ public class CommandExecution {
 	    	
 	    	/* >-----------------------------------------------------------------------< */
 	    	
-	      case 0x0D00:
-	        System.out.println(">>>Not implemented: " + "RLF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x0D00: // RLF (Shift value of file register left once and storing left-falling-off bit in C-Flag)
+		    System.out.println("RLF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	    	  // Direct Addressing
+	    	  if(opcAndArguments[2] != 0)
+	    	  {
+	    		  // Fetch value directly from File Register
+	    		  byte value = (byte) Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit()); 
+
+	    		  //Execute Operation (rotate left through carry)
+	    		  int carryBit;
+	    		  carryBit = (value & 0x0080) >> 7;
+	    		  value = (byte)(value & 0x007F);
+	    		  value = (byte)(value << 1);
+	    		  value += (Pic16F84Registers.PSW & 0b00000001);
+	    		  
+	    		  if(carryBit == 1)
+		    		    Pic16F84Registers.set_Flag("C_FLAG");
+	    		  else if(carryBit == 0)
+	    			  Pic16F84Registers.reset_Flag("C_FLAG");
+	    		    else
+	    		    	System.out.println(">>>ERROR: Wrong value for carry-bit!");
+	    		  
+	    		  // Destination -> W_Register
+	    		  if(opcAndArguments[1] == 0)
+	    		  {
+	  				  System.out.println("RLF: " + "Moving " + String.format("%2X", value) + "h" + "to W");
+	    			  Pic16F84Registers.W_REGISTER = (byte)value;
+	    		  }
+	    		  // Destination -> File Register
+	    		  else if(opcAndArguments[1] == 1)
+	    		  {
+	  				  System.out.println("RLF: " + "Moving " + String.format("%2X", value) + "h" + "to File Register");
+	    			  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)value);
+	    		  }
+	    		  // Destination Error
+	    		  else
+	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
+	    	  }
+	    	  // Indirect Addressing
+	    	  else
+	    	  {
+	    		  // Fetch value indirectly from File Register
+	    		  byte value = (byte) Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
+	    		  
+	    		  //Execute Operation (rotate left through carry)
+	    		  int carryBit;
+	    		  carryBit = (value & 0x0080) >> 7;
+	    		  value = (byte)(value & 0x007F);
+	    		  value = (byte)(value << 1);
+	    		  value += (Pic16F84Registers.PSW & 0b00000001);
+	    		  
+	    		  if(carryBit == 1)
+		    		    Pic16F84Registers.set_Flag("C_FLAG");
+	    		  else if(carryBit == 0)
+	    			  Pic16F84Registers.reset_Flag("C_FLAG");
+	    		    else
+	    		    	System.out.println(">>>ERROR: Wrong value for carry-bit!");
+	    		  
+	    		  // Destination -> W_Register
+	    		  if(opcAndArguments[1] == 0)
+	    		  {
+	    			  System.out.println("RLF: " + "Moving " + String.format("%2X", (byte)value) + "h" + "to W");
+	    			  Pic16F84Registers.W_REGISTER = (byte)value;
+	    		  }
+	    		  // Destination -> File Register
+	    		  else if(opcAndArguments[1] == 1)
+	    		  {
+	    			  System.out.println("RLF: " + "Moving " + String.format("%2X", (byte)value) + "h" + "to File Register");
+	    			  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), (byte)value);
+	    		  }
+	    		  // Destination Error
+	    		  else
+	    			  System.out.println(">>>ERROR: Destination Bit Unclear");
+	    	  }
 	    	break;
 	    	
 	    	/* >-----------------------------------------------------------------------< */
 	    	
-	      case 0x0C00:
-	    	System.out.println(">>>Not implemented: " + "RRF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x0C00: //RRF (Shift value of file register right once and storing right-falling-off bit in C-Flag)
+			    System.out.println("RRF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+		    	  // Direct Addressing
+		    	  if(opcAndArguments[2] != 0)
+		    	  {
+		    		  // Fetch value directly from File Register
+		    		  byte value = (byte) Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit()); 
+
+		    		  //Execute Operation (rotate left through carry)
+		    		  int carryBit;
+		    		  carryBit = (value & 0x0001);
+		    		  value = (byte)(value >> 1);
+		    		  value += ((Pic16F84Registers.PSW & 0b00000001) << 7);
+		    		  
+		    		  if(carryBit == 1)
+			    		    Pic16F84Registers.set_Flag("C_FLAG");
+		    		  else if(carryBit == 0)
+		    			  Pic16F84Registers.reset_Flag("C_FLAG");
+		    		    else
+		    		    	System.out.println(">>>ERROR: Wrong value for carry-bit!");
+		    		  
+		    		  // Destination -> W_Register
+		    		  if(opcAndArguments[1] == 0)
+		    		  {
+		  				  System.out.println("RRF: " + "Moving " + String.format("%2X", value) + "h" + "to W");
+		    			  Pic16F84Registers.W_REGISTER = (byte)value;
+		    		  }
+		    		  // Destination -> File Register
+		    		  else if(opcAndArguments[1] == 1)
+		    		  {
+		  				  System.out.println("RRF: " + "Moving " + String.format("%2X", value) + "h" + "to File Register");
+		    			  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)value);
+		    		  }
+		    		  // Destination Error
+		    		  else
+		    			  System.out.println(">>>ERROR: Destination Bit Unclear");
+		    	  }
+		    	  // Indirect Addressing
+		    	  else
+		    	  {
+		    		  // Fetch value indirectly from File Register
+		    		  byte value = (byte) Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
+		    		  
+		    		  //Execute Operation (rotate left through carry)
+		    		  int carryBit;
+		    		  carryBit = (value & 0x0001);
+		    		  value = (byte)(value >> 1);
+		    		  value += ((Pic16F84Registers.PSW & 0b00000001) << 7);
+		    		  
+		    		  if(carryBit == 1)
+			    		    Pic16F84Registers.set_Flag("C_FLAG");
+		    		  else if(carryBit == 0)
+		    			  Pic16F84Registers.reset_Flag("C_FLAG");
+		    		    else
+		    		    	System.out.println(">>>ERROR: Wrong value for carry-bit!");
+		    		  
+		    		  // Destination -> W_Register
+		    		  if(opcAndArguments[1] == 0)
+		    		  {
+		    			  System.out.println("RRF: " + "Moving " + String.format("%2X", (byte)value) + "h" + "to W");
+		    			  Pic16F84Registers.W_REGISTER = (byte)value;
+		    		  }
+		    		  // Destination -> File Register
+		    		  else if(opcAndArguments[1] == 1)
+		    		  {
+		    			  System.out.println("RRF: " + "Moving " + String.format("%2X", (byte)value) + "h" + "to File Register");
+		    			  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), (byte)value);
+		    		  }
+		    		  // Destination Error
+		    		  else
+		    			  System.out.println(">>>ERROR: Destination Bit Unclear");
+		    	  }
 	    	break;
 	    	
 	    	/* >-----------------------------------------------------------------------< */
@@ -682,26 +981,183 @@ public class CommandExecution {
 	    	
 	    	/* >-----------------------------------------------------------------------< */
 	    
-	      case 0x1000:
-	    	System.out.println(">>>Not implemented: " + "BCF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x1000: //BCF (clears 1 bit selected by opcAndAgument[1] in indirect File Register or directly in opcAndArguments[2])
+			 System.out.println("BCF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	    	 // Direct Addressing
+	    	 if(opcAndArguments[2] != 0)
+	    	  {  
+	    		  // Fetch Value directly	    		  
+	    		  int value = Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit());
+	    		  
+	    		  
+	    		  // Execute operation (Bit clearing)
+	    		  value = (value & ~(1 << opcAndArguments[1]));
+
+	  			  System.out.println("BCF: " + "Clearing bit " + String.format("%2X", opcAndArguments[1]) + "h" + " from " + String.format("%2X", opcAndArguments[2]));	
+		    	  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)value);
+	    	  }
+	    	  // Indirect Addressing
+	    	  else
+	    	  {
+	    		  // Fetch Value indirectly	    		  
+	    		  int value = Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
+	    		  
+	    		  // Execute operation (Bit clearing)
+	    		  value = (value & ~(1 << opcAndArguments[1]));
+
+	  			  System.out.println("BCF: " + "Clearing bit " + String.format("%2X", opcAndArguments[1]) + "h" + " from " + String.format("%2X", Pic16F84Registers.getIndirectAdressFromFSR()));	
+		    	  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), (byte)value);
+	    	  } 
 	    	break;
 	    	
 	    	/* >-----------------------------------------------------------------------< */
 	    	
-	      case 0x1400:
-	    	System.out.println(">>>Not implemented: " + "BSF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x1400:  //BSF (set 1 bit selected by opcAndAgument[1] in indirect File Register or directly in opcAndArguments[2])
+			 System.out.println("BSF" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	    	 // Direct Addressing
+	    	 if(opcAndArguments[2] != 0)
+	    	  {  
+	    		  // Fetch Value directly	    		  
+	    		  int value = Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit());
+	    		  
+	    		  
+	    		  // Execute operation (Bit clearing)
+	    		  value = (value | (1 << opcAndArguments[1]));
+
+	  			  System.out.println("BSF: " + "Clearing bit " + String.format("%2X", opcAndArguments[1]) + "h" + " from " + String.format("%2X", opcAndArguments[2]));	
+		    	  Pic16F84Registers.writeFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit(), (byte)value);
+	    	  }
+	    	  // Indirect Addressing
+	    	  else
+	    	  {
+	    		  // Fetch Value indirectly	    		  
+	    		  int value = Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
+	    		  
+	    		  // Execute operation (Bit clearing)
+	    		  value = (value | (1 << opcAndArguments[1]));
+
+	  			  System.out.println("BSF: " + "Clearing bit " + String.format("%2X", opcAndArguments[1]) + "h" + " from " + String.format("%2X", Pic16F84Registers.getIndirectAdressFromFSR()));	
+		    	  Pic16F84Registers.writeFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR(), (byte)value);
+	    	  } 
 	    	break;
 	    	
 	    	/* >-----------------------------------------------------------------------< */
 	    	
-	      case 0x1800:
-	    	System.out.println(">>>Not implemented: " + "BTFSC" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x1800: //BTFSC (Skip the next instruction if the bit is set to 0 selected by opcAndArguments[1] from the File Register - Value (direct or indirect), or continue normally if it´s set to 1)
+				 System.out.println("BTFSC" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+		    	 // Direct Addressing
+		    	 if(opcAndArguments[2] != 0)
+		    	  {  
+		    		  System.out.println("BTFSC: " + "Test bit " + String.format("%2X", opcAndArguments[1]) + " from " + "file register " + String.format("%2X", opcAndArguments[2]));	
+		    		   
+		    		  // Fetch Value directly	    		  
+		    		  int value = Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit());
+		    		 
+		    		  // Execute operation (check for Bit (1 or 0)) 
+		    		  int bitValue = (value & (1 << opcAndArguments[1]));
+		    		  if(bitValue == 0)
+		    		  {
+		    		   System.out.println("BTFSC: " + "Executing NOP and skip next instruction!");	
+	    			   System.out.println("====================================================================");  
+	    			   CommandExecution.execute(0x0000);
+	    			   System.out.println("====================================================================");  
+		    		  }
+		    		  else if((bitValue >> opcAndArguments[1]) == 1)
+		    		  {
+		    		   System.out.println("BTFSC: " + "Going on normally...");		  
+		    		  }			
+		    		  else
+		    		  {
+		    		   System.out.println(">>>ERROR " + "Invalid value of Result-Bit!");
+		    		  }
+		    	  }
+		    	  // Indirect Addressing
+		    	  else
+		    	  {
+		    		  System.out.println("BTFSC: " + "Test bit " + String.format("%2X", opcAndArguments[1]) + " from " + "file register " + String.format("%2X", Pic16F84Registers.getIndirectAdressFromFSR()));	
+		    		  
+		    		  // Fetch Value indirectly	    		  
+		    		  int value = Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
+		    		  
+		    		  // Execute operation (check for Bit (1 or 0)) 
+		    		  int bitValue = (value & (1 << opcAndArguments[1]));
+		    		  if(bitValue == 0)
+		    		  {
+		    		   System.out.println("BTFSC: " + "Executing NOP and skip next instruction!");	
+	    			   System.out.println("====================================================================");  
+	    			   CommandExecution.execute(0x0000);
+	    			   System.out.println("====================================================================");  
+		    		  }
+		    		  else if((bitValue >> opcAndArguments[1]) == 1)
+		    		  {
+		    		   System.out.println("BTFSC: " + "Going on normally...");		  
+		    		  }			
+		    		  else
+		    		  {
+		    		   System.out.println(">>>ERROR " + "Invalid value of Result-Bit!");
+		    		  }
+		    	  } 
 	    	break;
 	    	
 	    	/* >-----------------------------------------------------------------------< */
 	    	
-	      case 0x1C00:
-	    	System.out.println(">>>Not implemented: " + "BTFSS" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x1C00: //BTFSS (Skip the next instruction if the bit is set to 1 selected by opcAndArguments[1] from the File Register - Value (direct or indirect), or continue normally if it´s set to 0)	  
+				 System.out.println("BTFSS" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+		    	 // Direct Addressing
+		    	 if(opcAndArguments[2] != 0)
+		    	  {  
+		    		  System.out.println("BTFSS: " + "Test bit " + String.format("%2X", opcAndArguments[1]) + " from " + "file register " + String.format("%2X", opcAndArguments[2]));	
+		    		  
+		    		  // Fetch Value directly	    		  
+		    		  int value = Pic16F84Registers.readFileRegisterValue(opcAndArguments[2], Pic16F84Registers.getRP0Bit());	  
+		    		  
+		    		  // Execute operation (check for Bit (1 or 0)) 
+		    		  int bitValue = (value & (1 << opcAndArguments[1]));
+		    		  if((bitValue >> opcAndArguments[1]) ==1)
+		    		  {
+		    		   System.out.println("BTFSS: " + "Executing NOP and skip next instruction!");	
+	    			   System.out.println("====================================================================");  
+	    			   Pic16F84Registers.INSTRUCTION_REGISTER = 0x0000;
+	    			   CommandExecution.execute(Pic16F84Registers.INSTRUCTION_REGISTER);
+	    			   System.out.println("====================================================================");  
+		    		  }
+		    		  else if(bitValue == 0)
+		    		  {
+		    		   System.out.println("BTFSS: " + "Going on normally...");		  
+		    		  }			
+		    		  else
+		    		  {
+		    			  System.out.println("Else If: "+ (bitValue >> opcAndArguments[1]));
+		    		   System.out.println(">>>ERROR " + "Invalid value of Result-Bit!");
+		    		  }
+		    	  }
+		    	  // Indirect Addressing
+		    	  else
+		    	  {
+		    		  System.out.println("BTFSS: " + "Test bit " + String.format("%2X", opcAndArguments[1]) + " from " + "file register " + String.format("%2X", Pic16F84Registers.getIndirectAdressFromFSR()));	
+		    		  
+		    		  // Fetch Value indirectly	    		  
+		    		  int value = Pic16F84Registers.readFileRegisterValue(Pic16F84Registers.getIndirectAdressFromFSR(), Pic16F84Registers.getBankBitFromFSR());
+		    		  
+		    		  // Execute operation (check for Bit (1 or 0)) 
+		    		  int bitValue = (value & (1 << opcAndArguments[1]));
+		    		  if((bitValue >> opcAndArguments[1]) ==1)
+		    		  {
+		    		   System.out.println("BTFSS: " + "Executing NOP and skip next instruction!");		    		    
+	    			   System.out.println("====================================================================");  
+	    			   Pic16F84Registers.INSTRUCTION_REGISTER = 0x0000;
+	    			   CommandExecution.execute(Pic16F84Registers.INSTRUCTION_REGISTER);
+	    			   System.out.println("====================================================================");  
+		    		  }
+		    		  else if(bitValue == 0)
+		    		  {
+		    		   System.out.println("BTFSS: " + "Going on normally...");		  
+		    		  }			
+		    		  else
+		    		  {
+		    		   System.out.println(">>>ERROR " + "Invalid value of Result-Bit!");
+		    		  }
+		    	  } 
 	        break;
 	        
 	        /* >-----------------------------------------------------------------------< */
@@ -775,8 +1231,12 @@ public class CommandExecution {
 			
 			/* >-----------------------------------------------------------------------< */
 			   	
-	      case 0x3400:
-			System.out.println(">>>Not implemented: " + "RETLW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      case 0x3400: //RETLW (returns from a function and pops the saved PC from the stack and additionally writes opcAndArguments[1] to W)
+			System.out.println("RETLW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+			System.out.println("RETLW: " + "Jumping back to: " + String.format("%2X", Pic16F84Registers.STACK[Pic16F84Registers.STACKPOINTER]) + "h" + "and moving " + String.format("%2X", opcAndArguments[1]) + "to W");
+	    	Pic16F84Registers.PC = Pic16F84Registers.pop();
+	    	Pic16F84Registers.loadPCToPCL();
+	    	Pic16F84Registers.W_REGISTER = (byte)opcAndArguments[1];
 			break;	
 			
 			/* >-----------------------------------------------------------------------< */
