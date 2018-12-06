@@ -12,14 +12,18 @@ public class MainClass {
 		System.out.println("==================Starting Simulator Pic16F84=======================");
 		System.out.println("====================================================================");
 		
+		
+		
 		//Creating Simulator
 		Simulator simulator = new Simulator();
 		
 		//Init Simulator with file path, page number andnumber of CPU-Cycles
-		simulator.initSimulator("./src/LSTFiles/TPicSim4.LST", 0, 200); 
+		simulator.initSimulator("./src/LSTFiles/TPicSim1.LST", 0, 50); 
 		
-		//Starting Simulator
-		simulator.startSimulator();
+		//Init GUI
+		SimulatorGUI.initFrame(simulator);
+		
+		/*NOTE: Simulator startet by the GUi */
 	}
 
 }

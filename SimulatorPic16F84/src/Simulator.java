@@ -14,6 +14,9 @@ public class Simulator {
 	boolean programMemoryContainsProgram = false;
 	int amountOfCPUCyclesExecuted = 0;
 	
+	//Saving a copy of the parsed textfile for GUI
+	String[] textCopy;
+	
 	
 	/* >>> SIMULATION <<< */
 	
@@ -28,6 +31,7 @@ public class Simulator {
 	   parser = new LSTParser(filePath); 
 	   System.out.println("====================================================================");	   
 	   String[] text = parser.readFile();
+	   textCopy = text;
 	   parser.printFile(text);
 	   System.out.println("====================================================================");
 	   String[] codeText = parser.extractCodeline(text);
@@ -70,6 +74,13 @@ public class Simulator {
 	      System.out.println("====================================================================");
 	     }
 	  }	
+	
+	
+	//Stops the Simulator
+	public void stopSimulator()
+	{
+		System.out.println("Implement stop-simulator");
+	}
 	
 	
 	/* >>> METHODS <<< */

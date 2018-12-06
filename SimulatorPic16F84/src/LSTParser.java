@@ -10,7 +10,7 @@ public class LSTParser {
 	
 	public FileReader reader;	// data reader
 	public BufferedReader bufferedReader;	// for reading each line of data 
-	public String[] fileText = new String[200];	// save data from bufferedReader when it read // NOTE: can change to local variable
+	public String[] fileText = new String[500];	// save data from bufferedReader when it read // NOTE: can change to local variable
 
 	
 	/* >>> CONSTRUCTOR <<< */
