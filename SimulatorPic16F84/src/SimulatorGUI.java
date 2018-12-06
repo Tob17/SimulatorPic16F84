@@ -1,19 +1,14 @@
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.io.IOException;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JTextField;
 
 
 
@@ -26,52 +21,61 @@ public class SimulatorGUI extends JPanel implements ActionListener {
 	
 	
   /* >>> Class-Methods <<< */
-
+	
+	
+  public static void init(String filePath, int programPageNumber, int amountOfCPUCycles)  throws IOException 
+  {
+   //Initializing Frame and Main-Panel, while grabbing the Main-Panel
+   SimulatorGUI simPane = initFrame();
+   //Initializing the Simulator
+   simPane.lstText = simPane.simulator.initSimulator(filePath, programPageNumber, amountOfCPUCycles); 
+   //Setting Layout of the Main-Panel
+   simPane.initLayout();
+   //Repainting everything after everything has been loaded!
+   simPane.repaint();
+  }
+	
+	
   // Creating and initializing a Frame that hold our GUI
-  public static void initFrame(Simulator simulator)
+  public static SimulatorGUI initFrame()
     {
 	 JFrame simulatorWindow = new JFrame("Simulator");
 	 SimulatorGUI simulatorContentPane = new SimulatorGUI();
 		
-	 /* Adding a main-pane into the Frame and setting sizes and visibility */
+	 //Adding a main-pane into the Frame and setting sizes and visibility
 	 simulatorWindow.setContentPane(simulatorContentPane);
-	 simulatorWindow.setSize(1920,1080);
+	 simulatorWindow.setSize(1600,900);
 	 simulatorWindow.setVisible(true);
 	 simulatorWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	 
-	 
-	 simulatorContentPane.bindSimulatorToGUI(simulator);
-	 simulatorContentPane.initLayout();
+	 return simulatorContentPane;
 	}
   
   
-  /* >>> Currently running simulator-objekt <<< */
-  
-  Simulator simulator = null;
   
   
-  /* >>> GUI-Elements <<< */
+  /* >>> Object-Variables <<< */
   
+  //Simulator-Object
+  Simulator simulator = new Simulator();
+  
+  //Copy of the lst-file-text
+  String lstText[];
+  
+  //GUI-Elements
   JButton runButton = new JButton("Run");
   JButton stopButton = new JButton("Stop");
   JButton stepButton = new JButton("Step");
   JButton resetButton = new JButton("Reset");
   
-  TaggedLabel lstLabelList[] = null;
+  TaggedLabel lstLabelList[];
+  
   
   
   /* >>> Object-Methods <<< */
+
   
-  //Grabbing the currently running simulator and saving it local
-  public void bindSimulatorToGUI(Simulator simulator)
-  {
-	  this.simulator = simulator;
-  }
-  
-  
-  /* Drawing our GUI in the Frame */	
-  
-  //Inits the main-panels layout
+  //Initializes the main-panel´s layout
   public void initLayout()
   {	    	  
 	  /* Setting up basic layout */
@@ -150,7 +154,7 @@ public class SimulatorGUI extends JPanel implements ActionListener {
 	  contentPanel3.add(stepButton);
 	  contentPanel4.add(resetButton);
 	  
-	  initLSTGrid(contentPanel5, simulator.textCopy);
+	  initLSTGrid(contentPanel5);
 	  
 	  /* Activating Signal-Listener */
 	  
@@ -160,20 +164,21 @@ public class SimulatorGUI extends JPanel implements ActionListener {
 	  resetButton.addActionListener(this);  
   }
   
-  //Inits array of labels with the copied text of the LST-File stored in simulator
-  public void initLSTGrid(JPanel LSTPanel, String[] LSTText)
+  
+  //Inits a Panel with an array of labels with the stored last-file-text
+  public void initLSTGrid(JPanel LSTPanel)
   {
-	  LSTPanel.setLayout(new GridLayout(LSTText.length, 1,1,1));
-	  lstLabelList = new TaggedLabel[LSTText.length];
+	  LSTPanel.setLayout(new GridLayout(lstText.length, 1,1,1));
+	  lstLabelList = new TaggedLabel[lstText.length];
 	  
-	  for(int i = 0; i < LSTText.length; i++)
+	  for(int i = 0; i < lstText.length; i++)
 	    {
-		  lstLabelList[i] = new TaggedLabel(LSTText[i]);
+		  lstLabelList[i] = new TaggedLabel(lstText[i]);
 		  lstLabelList[i].setOpaque(true);
 		  lstLabelList[i].setBackground(Color.GREEN);
 		  
-		  if(!LSTText[i].substring(0,4).equals("    "))
-		      lstLabelList[i].lineNumber = Integer.parseInt(LSTText[i].substring(0,4));
+		  if(!lstText[i].substring(0,4).equals("    "))
+		      lstLabelList[i].lineNumber = Integer.parseInt(lstText[i].substring(0,4));
 		  else
 			  lstLabelList[i].lineNumber = -1; 
 	      
@@ -181,6 +186,9 @@ public class SimulatorGUI extends JPanel implements ActionListener {
 	    }
   }
   
+  
+  
+  /* >>> Drawing onto the Panel <<< */
   
   
   @Override

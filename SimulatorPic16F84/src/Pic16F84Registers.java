@@ -59,7 +59,7 @@ public class Pic16F84Registers {
 
 	/* >>> INIT REGISTERS <<< */
 
-	// Initializes each register with 0
+	//Initializes each register with 0
 	static void initRegisters()
 	{
 		W_REGISTER = 0;
@@ -72,6 +72,19 @@ public class Pic16F84Registers {
 		FSR = 0;
 	}
 
+	
+	/* >>> INIT RAM, ROM AND STACK <<< */
+	
+	//Initializes every data register with 0
+	static void initMemory()
+	{
+		for(int i = 0; i < STACK.length; i++)
+			STACK[i] = 0;
+		for(int i = 0; i < RAM_BANK_0.length; i++)
+			RAM_BANK_0[i] = 0;
+		for(int i = 0; i < RAM_BANK_1.length; i++)
+			RAM_BANK_1[i] = 0;
+	}
 	
 	
 	

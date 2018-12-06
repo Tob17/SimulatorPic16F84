@@ -12,26 +12,21 @@ public class Simulator {
 	/* >>> SIMULATOR-VARIABLES <<< */
 	
 	boolean programMemoryContainsProgram = false;
-	int amountOfCPUCyclesExecuted = 0;
-	
-	//Saving a copy of the parsed textfile for GUI
-	String[] textCopy;
-	
+	int amountOfCPUCycles = 0;
+
 	
 	/* >>> SIMULATION <<< */
 	
-	//Inits the Simulator by parsing a file that contains code und writes it to "program"
-	public void initSimulator(String filePath, int page, int amountOfCPUCycles) throws IOException 
+	//Inits the Simulator by parsing a file that contains code and writes it to "program". Returns the raw Text-file for other purposes to avoid another parser-call!
+	public String[] initSimulator(String filePath, int page, int amountOfCyclesExecuted) throws IOException 
 	  {
-	   Pic16F84Registers.initRegisters(); // allways init Registers first
+	   //Putting everything into the program-memory
 	   Pic16F84Registers.settingProgramPage(page); // selecting custom program-memory page
-	   amountOfCPUCyclesExecuted = amountOfCPUCycles; // amounts of CPU-cycles the simulator executes
 	   LSTParser parser; // Parser that reads and extracts code from text-files
 	   System.out.println("====================================================================");	   
 	   parser = new LSTParser(filePath); 
 	   System.out.println("====================================================================");	   
 	   String[] text = parser.readFile();
-	   textCopy = text;
 	   parser.printFile(text);
 	   System.out.println("====================================================================");
 	   String[] codeText = parser.extractCodeline(text);
@@ -44,24 +39,42 @@ public class Simulator {
 	   loadProgramIntoProgramMemory(parser.convertStringCommandsToInteger(programAsStrings));
 	   parser.closeFile();
 	   System.out.println("====================================================================");
+	   
+	   //Setting the amount of Cycles the CPU should run on the code parsed above
+	   amountOfCPUCycles = amountOfCyclesExecuted;
+	   
+	   System.out.println("====================================================================");
+	   System.out.println("==================== Waiting for User... ===========================");
+	   System.out.println("====================================================================");
+	   
+	   return text;
 	  }
+	
 	
 	//Starts the Simulator by executing all the lines contained in "program"
 	public void startSimulator()
 	  {	
 	   System.out.println("Starting execution...");
 	   System.out.println("====================================================================");
+	   Pic16F84Registers.initRegisters(); // allways init Registers first
+	   Pic16F84Registers.initMemory(); // allways clear memory accordingly
+	   System.out.println("========================= Memory whiped! ===========================");
+	   System.out.println("====================================================================");
+	   
 	   Pic16F84Registers.printAllFlags();
 	   Pic16F84Registers.printAllRegisters();
 	   System.out.println("====================================================================");
 
-	   //Main-Routine
+	   
+	   
+	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
+	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Main-Routine <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
+	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
+	      
 	   if(programMemoryContainsProgram)
 	     {
-	      for(int i = 0; i < amountOfCPUCyclesExecuted; i++)
-	      {
+	      for(int i = 0; i < amountOfCPUCycles; i++)
 		     CPU_Cycle();	
-	      }
 	   
 	  
 	      System.out.println("Execution finished!");
@@ -75,12 +88,19 @@ public class Simulator {
 	     }
 	  }	
 	
+	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
+	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Main-Routine <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
+	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
+	
+	
+	
 	
 	//Stops the Simulator
 	public void stopSimulator()
 	{
 		System.out.println("Implement stop-simulator");
 	}
+	
 	
 	
 	/* >>> METHODS <<< */
@@ -111,6 +131,7 @@ public class Simulator {
 	   System.out.println("====================================================================");  
 	  }
 	
+	
 	//Copies the program extracted from the textfile into the static Program-Memory
 	public void loadProgramIntoProgramMemory(int[] program)
 	  {
@@ -119,6 +140,7 @@ public class Simulator {
 		   Pic16F84Registers.PROGRAM_MEMORY[(Pic16F84Registers.PC & 0b1100000000000) + i] = (short)program[i];
 	   programMemoryContainsProgram = true;
 	  }
+	
 	
 	//Erases the content of the Program-Memory
 	public void whipeProgramMemory()
