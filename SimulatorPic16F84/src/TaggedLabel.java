@@ -7,5 +7,9 @@ public class TaggedLabel extends JLabel {
 	{super(text);}
 	
 	public int lineNumber;
+	public boolean breakpointActive = false;
+	
+	public void toggleBreakpoint()
+	{breakpointActive = !breakpointActive;}
 	
 }

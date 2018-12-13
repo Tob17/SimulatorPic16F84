@@ -3,6 +3,8 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 
 import javax.swing.JButton;
@@ -12,7 +14,7 @@ import javax.swing.JSplitPane;
 
 
 
-public class SimulatorGUI extends JPanel implements ActionListener {
+public class SimulatorGUI extends JPanel implements ActionListener, MouseListener {
 	
 	/* TODO: Implement Breakpoints */
 	/* TODO: Implement Runtime-Counter */
@@ -39,7 +41,9 @@ public class SimulatorGUI extends JPanel implements ActionListener {
   // Creating and initializing a Frame that hold our GUI
   public static SimulatorGUI initFrame()
     {
+	  System.out.println("OUT4");
 	 JFrame simulatorWindow = new JFrame("Simulator");
+	 System.out.println("OUT4");
 	 SimulatorGUI simulatorContentPane = new SimulatorGUI();
 		
 	 //Adding a main-pane into the Frame and setting sizes and visibility
@@ -68,7 +72,7 @@ public class SimulatorGUI extends JPanel implements ActionListener {
   JButton stepButton = new JButton("Step");
   JButton resetButton = new JButton("Reset");
   
-  TaggedLabel lstLabelList[];
+  TaggedLabel lstLabelList[] = null;
   
   
   
@@ -162,6 +166,10 @@ public class SimulatorGUI extends JPanel implements ActionListener {
 	  stopButton.addActionListener(this);
 	  stepButton.addActionListener(this);
 	  resetButton.addActionListener(this);  
+	  
+	  for(int a = 0; a < lstLabelList.length; a++)
+		  lstLabelList[a].addMouseListener(this);
+	  
   }
   
   
@@ -171,7 +179,7 @@ public class SimulatorGUI extends JPanel implements ActionListener {
 	  LSTPanel.setLayout(new GridLayout(lstText.length, 1,1,1));
 	  lstLabelList = new TaggedLabel[lstText.length];
 	  
-	  for(int i = 0; i < lstText.length; i++)
+	  for(int i = 0; i < lstLabelList.length; i++)
 	    {
 		  lstLabelList[i] = new TaggedLabel(lstText[i]);
 		  lstLabelList[i].setOpaque(true);
@@ -194,7 +202,20 @@ public class SimulatorGUI extends JPanel implements ActionListener {
   @Override
   public void paint(Graphics g)
     {
+	  System.out.println("OUT2");
 	  super.paint(g);
+	  
+	  System.out.println("OUT1");
+	  if(lstLabelList != null)
+	    for(int a = 0; a < lstLabelList.length; a++)
+	      {
+//	    	System.out.println(a + "" + lstLabelList[a].breakpointActive);
+		   if(lstLabelList[a].breakpointActive == true)
+			  lstLabelList[a].setBackground(Color.RED);
+		   else 
+			  lstLabelList[a].setBackground(Color.GREEN);
+	      }
+	  System.out.println("OUT3");
 	 /* TODO: Drawing GUI-Elements */
 	 /* TODO: Visualizing data on our GUI */
 	}
@@ -207,7 +228,7 @@ public class SimulatorGUI extends JPanel implements ActionListener {
 @Override
 public void actionPerformed(ActionEvent e) 
     {
-	  //Starting Simulator
+	 //Starting Simulator
 	 if(e.getSource() == runButton)
 	   simulator.startSimulator();
 	 
@@ -223,5 +244,28 @@ public void actionPerformed(ActionEvent e)
 
 	}
 
+@Override
+public void mouseClicked(MouseEvent e) {}
+
+
+@Override
+public void mouseEntered(MouseEvent e) {}
+
+
+@Override
+public void mouseExited(MouseEvent e) {}
+
+
+@Override
+public void mousePressed(MouseEvent e) 
+{
+ TaggedLabel clickedLabel = (TaggedLabel)e.getSource();
+ clickedLabel.toggleBreakpoint();
+ repaint();
+}
+
+
+@Override
+public void mouseReleased(MouseEvent e) {}
   
 }
