@@ -16,26 +16,24 @@ import javax.swing.JSplitPane;
 
 public class SimulatorGUI extends JPanel implements ActionListener, MouseListener {
 	
-	/* TODO: Implement Breakpoints */
 	/* TODO: Implement Runtime-Counter */
 	/* TODO: Implement Clock-Generator */
-    /* TODO: specify user events! */
 	
 	
   /* >>> Class-Methods <<< */
 	
 	
   public static void init(String filePath, int programPageNumber)  throws IOException 
-  {
-   //Initializing Frame and Main-Panel, while grabbing the Main-Panel
-   SimulatorGUI simPane = initFrame();
-   //Initializing the Simulator
-   simPane.lstText = simPane.simulator.initSimulator(filePath, programPageNumber); 
-   //Setting Layout of the Main-Panel
-   simPane.initLayout();
-   //Repainting everything after everything has been loaded!
-   simPane.repaint();
-  }
+    {
+     //Initializing Frame and Main-Panel, while grabbing the Main-Panel
+     SimulatorGUI simPane = initFrame();
+     //Initializing the Simulator
+     simPane.lstText = simPane.simulator.initSimulator(filePath, programPageNumber); 
+     //Setting Layout of the Main-Panel
+     simPane.initLayout();
+     //Repainting everything after everything has been loaded!
+     simPane.repaint();
+    }
 	
 	
   // Creating and initializing a Frame that hold our GUI
@@ -63,12 +61,9 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
   
   //Copy of the lst-file-text
   String lstText[] = null;
-  
-  //Currently stopped at Breakpoint
-  boolean jumpThroughBreakpoint = false;
-  
+
   //Thread for executing commands
-  Thread mainExecutionThread = new Thread(new Runnable() {public void run() {startMainExecutionCycle();}});
+  ExecutionThread mainExecutionThread;
   
   //GUI-Elements
   JButton runButton = new JButton("Run");
@@ -201,73 +196,48 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
   
 	//Checking if next next command contains a breakpoint by comparing PC with every Label available in the GUI´s Taggedlabel-list
 	public boolean checkForBreakPoint(int pc, TaggedLabel labelList[])
-	{
-	  for(int a = 0; a < labelList.length; a++)
-	    if((Pic16F84Registers.PC == labelList[a].lineNumber) && labelList[a].breakpointActive)	
+	  {
+	   for(int a = 0; a < labelList.length; a++)
+	     if((Pic16F84Registers.PC == labelList[a].lineNumber) && labelList[a].breakpointActive)	
 	    	return true;
 
-	  return false;
-	}
+	   return false;
+	  }
 	
 	
 	//Checks if a line in the label-list is currently executed and marks it with a colour
 	public void markLine(int pc, TaggedLabel labelList[])
-	{
-		for(int a = 0; a < labelList.length; a++)
-		{
-			if(labelList[a] != null)
-			{
-				if ((Pic16F84Registers.PC == labelList[a].lineNumber) && lstLabelList[a].breakpointActive)
-					labelList[a].setBackground(Color.MAGENTA);
-				else 
-				{
-					if(Pic16F84Registers.PC == labelList[a].lineNumber)	
-						labelList[a].setBackground(Color.BLUE);
-
-					if(lstLabelList[a].breakpointActive)
-						labelList[a].setBackground(Color.RED);
-
-					if(!(Pic16F84Registers.PC == labelList[a].lineNumber) && !(lstLabelList[a].breakpointActive))
-						labelList[a].setBackground(Color.GREEN);  
-				} 
-			}
-			else
-				continue;
-		} 
-	}
-
-
-	
-	/* ************************************************************************ */
-	/* ****************************** MAIN ROUTINE **************************** */
-	/* ************************************************************************ */
-	
-	//Starts the execution of CPU-Cycles
-	public void startMainExecutionCycle()
 	  {
-	   if(simulator.programMemoryContainsProgram)
-		  {
-			while(Pic16F84Registers.PC < simulator.amountOfCPUCycles)
-				if(!checkForBreakPoint(Pic16F84Registers.PC, lstLabelList) || jumpThroughBreakpoint)
-				  {
-				   System.out.println("Initializing next Cycle...");
-				   simulator.step();
-                   repaint();
-				   try {Thread.sleep(500);} catch (InterruptedException e1) {}
-				   jumpThroughBreakpoint = false;
-				  }
-			
-			if(checkForBreakPoint(Pic16F84Registers.PC, lstLabelList))
-				jumpThroughBreakpoint = true;
-		  }
-	  }
+	   if(labelList != null)
+	     {
+	      for(int a = 0; a < labelList.length; a++)
+		    {
+		     if(labelList[a] != null)
+		       {
+			    if((Pic16F84Registers.PC == labelList[a].lineNumber) && labelList[a].breakpointActive)
+			      labelList[a].setBackground(Color.MAGENTA);
+			    else 
+			      {
+				   if(Pic16F84Registers.PC == labelList[a].lineNumber)	
+				     labelList[a].setBackground(Color.BLUE);
+
+				   if(labelList[a].breakpointActive)
+				     labelList[a].setBackground(Color.RED);
+
+				   if(!(Pic16F84Registers.PC == labelList[a].lineNumber) && !(labelList[a].breakpointActive))
+				     labelList[a].setBackground(Color.GREEN);  
+				
+				   if(labelList[a].lineNumber == -1)
+				     labelList[a].setBackground(Color.LIGHT_GRAY); 
+				  } 
+			  }
+		  else
+		    continue;
+         } 
+	   }
+	 }
+
 	
-	/* ************************************************************************ */
-	/* ****************************** MAIN ROUTINE **************************** */
-	/* ************************************************************************ */
-  
-  
-  
   /* >>> Drawing onto the Panel <<< */
   
   
@@ -287,45 +257,53 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 public void actionPerformed(ActionEvent e) 
     {
 	 //Starting Simulator
-	 if(e.getSource() == runButton)
-	    mainExecutionThread.start();
+	 if(e.getSource() == runButton && mainExecutionThread == null)
+	   {mainExecutionThread = new ExecutionThread(this);
+	    mainExecutionThread.start();}
 	 
 	 //Stoping Simulator
 	 if(e.getSource() == stopButton)
-	   mainExecutionThread.stop();
+	   {mainExecutionThread.stopExecution();
+	    mainExecutionThread = null;}
 
-	 
+	 //Execute a single-step cycle
 	 if(e.getSource() == stepButton)
-		 lstLabelList[6].setBackground(Color.PINK);
+	   {
+		if(simulator.programMemoryContainsProgram && Pic16F84Registers.PC < simulator.amountOfCPUCycles)
+		  {
+		   if(!checkForBreakPoint(Pic16F84Registers.PC, lstLabelList))
+		     {
+			  System.out.println("Initializing next Cycle...");
+			  simulator.executeStep();
+			  repaint();
+			 }
+		   else
+		      System.out.println(">>>Breakpoint reached<<<");	 
+		  }  
+	   }
 	 
+	 //Resets the controller by resetting every register
 	 if(e.getSource() == resetButton)
-		 lstLabelList[6].setBackground(Color.BLUE);
-
+	   {simulator.resetController();
+		repaint();} 
 	}
-
-@Override
-public void mouseClicked(MouseEvent e) {}
-
-
-@Override
-public void mouseEntered(MouseEvent e) {}
-
-
-@Override
-public void mouseExited(MouseEvent e) {}
 
 
 @Override
 public void mousePressed(MouseEvent e) 
-{
- TaggedLabel clickedLabel = (TaggedLabel)e.getSource();
- clickedLabel.toggleBreakpoint();
- markLine(Pic16F84Registers.PC, lstLabelList);
- repaint();
-
-}
+  {
+   TaggedLabel clickedLabel = (TaggedLabel)e.getSource();
+   clickedLabel.toggleBreakpoint();
+   repaint();
+  }
 
 
+@Override
+public void mouseClicked(MouseEvent e) {}
+@Override
+public void mouseEntered(MouseEvent e) {}
+@Override
+public void mouseExited(MouseEvent e) {}
 @Override
 public void mouseReleased(MouseEvent e) {}
   

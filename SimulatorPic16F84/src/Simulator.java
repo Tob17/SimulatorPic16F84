@@ -4,7 +4,6 @@ public class Simulator {
 	
 	
 	/* TODO: Implement interruption of an execution and dealing with an interupt separativly */
-	/* TODO: Implement Breakpoints */
 	/* TODO: Implement Runtime-Counter */
 	/* TODO: Implement Clock-Generator */
 	
@@ -14,6 +13,7 @@ public class Simulator {
 	boolean programMemoryContainsProgram = false;
 	int amountOfCPUCycles = 0;
 
+	
 	
 	/* >>> SIMULATION <<< */
 	
@@ -50,13 +50,12 @@ public class Simulator {
 	   System.out.println("==================== Waiting for User... ===========================");
 	   System.out.println("====================================================================");
 	   
-	   
 	   return text;
 	  }
 
 	
 	//Performs a single-step-execution!!
-	public void step()
+	public void executeStep()
 	  {CPU_Cycle();}
 	
 	
@@ -65,8 +64,8 @@ public class Simulator {
 	  {	
 	   System.out.println("Resetting Registers...");
 	   System.out.println("====================================================================");
-	   Pic16F84Registers.initRegisters(); // always init Registers first
-	   Pic16F84Registers.initMemory(); // always clear memory accordingly
+	   Pic16F84Registers.initRegisters();
+	   Pic16F84Registers.initMemory();
 	   System.out.println("========================= Memory whiped! ===========================");
 	   System.out.println("====================================================================");
 		   
@@ -74,13 +73,6 @@ public class Simulator {
 	   Pic16F84Registers.printAllRegisters();
 	   System.out.println("====================================================================");   
 	  }
-	
-	
-	//Stops the Simulator
-	public void stopSimulator()
-	{
-		System.out.println("Implement stop-simulator");
-	}
 	
 	
 	

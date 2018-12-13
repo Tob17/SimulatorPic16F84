@@ -1,3 +1,6 @@
+/* Simulator by Tobias Kibelka and Tuan Nam Truong  *
+ * Latest Update: 13.12.2018                       */
+
 import java.io.IOException;
 
 public class MainClass {
