@@ -9,7 +9,7 @@ public class MainClass {
 		System.out.println("====================================================================");
 			
 		//Init GUI (GUI inits Simulator aswell)
-		SimulatorGUI.init("./src/LSTFiles/TPicSim1.LST", 0, 10);
+		SimulatorGUI.init("./src/LSTFiles/TPicSim1.LST", 0);
 	}
 
 }

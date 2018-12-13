@@ -18,7 +18,7 @@ public class Simulator {
 	/* >>> SIMULATION <<< */
 	
 	//Inits the Simulator by parsing a file that contains code and writes it to "program". Returns the raw Text-file for other purposes to avoid another parser-call!
-	public String[] initSimulator(String filePath, int page, int amountOfCyclesExecuted) throws IOException 
+	public String[] initSimulator(String filePath, int page) throws IOException 
 	  {
 	   //Putting everything into the program-memory
 	   Pic16F84Registers.settingProgramPage(page); // selecting custom program-memory page
@@ -41,58 +41,39 @@ public class Simulator {
 	   System.out.println("====================================================================");
 	   
 	   //Setting the amount of Cycles the CPU should run on the code parsed above
-	   amountOfCPUCycles = amountOfCyclesExecuted;
+	   amountOfCPUCycles = programAsStrings.length;
+	   
+	   //Resetting every Register as part of the initialization
+	   resetController();
 	   
 	   System.out.println("====================================================================");
 	   System.out.println("==================== Waiting for User... ===========================");
 	   System.out.println("====================================================================");
 	   
+	   
 	   return text;
 	  }
+
+	
+	//Performs a single-step-execution!!
+	public void step()
+	  {CPU_Cycle();}
 	
 	
-	//Starts the Simulator by executing all the lines contained in "program"
-	public void startSimulator()
+	//Resets every Register found in the Pic16F84-Controller
+	public void resetController()
 	  {	
-	   System.out.println("Starting execution...");
+	   System.out.println("Resetting Registers...");
 	   System.out.println("====================================================================");
-	   Pic16F84Registers.initRegisters(); // allways init Registers first
-	   Pic16F84Registers.initMemory(); // allways clear memory accordingly
+	   Pic16F84Registers.initRegisters(); // always init Registers first
+	   Pic16F84Registers.initMemory(); // always clear memory accordingly
 	   System.out.println("========================= Memory whiped! ===========================");
 	   System.out.println("====================================================================");
-	   
+		   
 	   Pic16F84Registers.printAllFlags();
 	   Pic16F84Registers.printAllRegisters();
-	   System.out.println("====================================================================");
-
-	   
-	   
-	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
-	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Main-Routine <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
-	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
-	      
-	   if(programMemoryContainsProgram)
-	     {
-	      for(int i = 0; i < amountOfCPUCycles; i++)
-		     CPU_Cycle();	
-	   
-	  
-	      System.out.println("Execution finished!");
-	      System.out.println("====================================================================");
-	     }
-	   //Main-Routine failed
-	   else
-	     {
-		  System.out.println("Execution failed! No Program to progress!");
-	      System.out.println("====================================================================");
-	     }
-	  }	
-	
-	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
-	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Main-Routine <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
-	   /*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   */
-	
-	
+	   System.out.println("====================================================================");   
+	  }
 	
 	
 	//Stops the Simulator
@@ -150,6 +131,5 @@ public class Simulator {
 	      Pic16F84Registers.PROGRAM_MEMORY[(Pic16F84Registers.PC & 0b1100000000000) + i] = 0;
 	   programMemoryContainsProgram = false;
 	  }
-	
 	
 }
