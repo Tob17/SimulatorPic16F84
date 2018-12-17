@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.concurrent.*;
 
 public class Simulator {
 	
@@ -12,7 +13,12 @@ public class Simulator {
 	
 	boolean programMemoryContainsProgram = false;
 	int amountOfCPUCycles = 0;
+	
+	
+	/* >>> SYNCHRONIZATION-VARIABLES <<< */
 
+	//Binary Semaphore (initialization with 1)
+	Semaphore semaphore = new Semaphore(1);
 	
 	
 	/* >>> SIMULATION <<< */
@@ -54,9 +60,13 @@ public class Simulator {
 	  }
 
 	
-	//Performs a single-step-execution!!
-	public void executeStep()
-	  {CPU_Cycle();}
+	//Performs a single-step-execution!! (atomically)
+	public void executeStep() throws InterruptedException
+	  {
+	   semaphore.acquire();
+	     CPU_Cycle();
+	   semaphore.release();
+	  }
 	
 	
 	//Resets every Register found in the Pic16F84-Controller

@@ -20,6 +20,7 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	/* TODO: Implement Clock-Generator */
 	
 	
+	
   /* >>> Class-Methods <<< */
 	
 	
@@ -236,6 +237,38 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
          } 
 	   }
 	 }
+	
+	
+	/* ************************************************************************ */
+	/* ****************************** MAIN ROUTINE **************************** */
+	/* ************************************************************************ */	
+	
+    //Starts the execution of CPU-Cycles
+	public void startMainExecutionCycle(ExecutionThread executedByThisThreadObject) throws InterruptedException
+	  {
+	   if(simulator.programMemoryContainsProgram)
+		  {
+			while(!executedByThisThreadObject.executionFinished && Pic16F84Registers.PC < simulator.amountOfCPUCycles)
+			  {
+			   if(!checkForBreakPoint(Pic16F84Registers.PC, lstLabelList))
+			     {
+				  System.out.println("Initializing next Cycle...");
+				  simulator.executeStep();
+				  repaint();
+				  try {Thread.sleep(500);} catch (InterruptedException e1) {}
+				 }
+			   else
+			     {
+				  System.out.println(">>>Breakpoint reached<<<");
+				  try {Thread.sleep(500);} catch (InterruptedException e1) {}
+				 }
+			  }
+		  }
+	  }	
+	
+	/* ************************************************************************ */
+	/* ****************************** MAIN ROUTINE **************************** */
+	/* ************************************************************************ */	
 
 	
   /* >>> Drawing onto the Panel <<< */
@@ -258,11 +291,26 @@ public void actionPerformed(ActionEvent e)
     {
 	 //Starting Simulator
 	 if(e.getSource() == runButton && mainExecutionThread == null)
-	   {mainExecutionThread = new ExecutionThread(this);
-	    mainExecutionThread.start();}
+	   {	 
+		 mainExecutionThread = new ExecutionThread(new Runnable() {public void run() {
+			 
+		/* ************************ Calling Main Routine in a new Thread ************************** */
+			 
+		mainExecutionThread.executionFinished = false;
+		try {startMainExecutionCycle(mainExecutionThread);} catch (InterruptedException e) {}
+		System.out.println("===================================================================="); 
+		System.out.println("=====================Execution Completed============================");  
+		System.out.println("====================================================================");}
+		 
+		/* ************************ Calling Main Routine in a new Thread ************************** */
+		 
+	   });
+	 
+	    mainExecutionThread.start();
+	   }
 	 
 	 //Stoping Simulator
-	 if(e.getSource() == stopButton)
+	 if(e.getSource() == stopButton && mainExecutionThread != null)
 	   {mainExecutionThread.stopExecution();
 	    mainExecutionThread = null;}
 
@@ -274,7 +322,7 @@ public void actionPerformed(ActionEvent e)
 		   if(!checkForBreakPoint(Pic16F84Registers.PC, lstLabelList))
 		     {
 			  System.out.println("Initializing next Cycle...");
-			  simulator.executeStep();
+			  try {simulator.executeStep();} catch (InterruptedException e1) {}
 			  repaint();
 			 }
 		   else
