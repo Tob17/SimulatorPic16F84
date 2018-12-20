@@ -273,8 +273,19 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	 }
 	
 	
+	//Actualizes the Runtime-Counter and the displayed frequency
+	void actualizeCounterAndFrequency()
+	  {
+	   DecimalFormat formating = new DecimalFormat();
+	   formating.setMaximumFractionDigits(2);
+	   runtimeCounterLabel.setText(String.valueOf(formating.format(Simulator.runtimeCounter) + " uS"));
+	   clockFrequencyLabel.setText(String.valueOf((int)Simulator.clockFrequency + " Hz"));
+	  }
+	
+	
+	
 	/* ************************************************************************ */
-	/* ****************************** MAIN ROUTINE **************************** */
+	/* *********************** MAIN ROUTINE (Threaded) ************************ */
 	/* ************************************************************************ */	
 	
     //Starts the execution of CPU-Cycles
@@ -301,9 +312,10 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  }	
 	
 	/* ************************************************************************ */
-	/* ****************************** MAIN ROUTINE **************************** */
+	/* ************************ MAIN ROUTINE (Threaded) *********************** */
 	/* ************************************************************************ */	
 
+	
 	
   /* >>> Drawing onto the Panel <<< */
   
@@ -311,21 +323,17 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
   @Override
   public void paint(Graphics g)
     {
-	  super.paint(g);
-	  markLine(Pic16F84Registers.PC, lstLabelList);
-	  
-	  DecimalFormat formating = new DecimalFormat();
-	  formating.setMaximumFractionDigits(2);
-	  runtimeCounterLabel.setText(String.valueOf(formating.format(Simulator.runtimeCounter) + " uS"));
-	  clockFrequencyLabel.setText(String.valueOf((int)Simulator.clockFrequency + " Hz"));
+	 super.paint(g);
+	 markLine(Pic16F84Registers.PC, lstLabelList);
+	 actualizeCounterAndFrequency();
 	}
 
   
   
-  /* >>> Interface implementations <<< */
+  /* >>> Interface-Methods implementation <<< */
 
   
-@Override
+@Override // Control-Buttons
 public void actionPerformed(ActionEvent e) 
     {
 	 //Starting Simulator
@@ -378,7 +386,7 @@ public void actionPerformed(ActionEvent e)
 	}
 
 
-@Override
+@Override // Command-Labels
 public void mousePressed(MouseEvent e) 
   {
    TaggedLabel clickedLabel = (TaggedLabel)e.getSource();
@@ -387,7 +395,7 @@ public void mousePressed(MouseEvent e)
   }
 
 
-@Override
+@Override // Frequency Scrollbar
 public void adjustmentValueChanged(AdjustmentEvent e) 
   {
    if(e.getSource() == this.clockFrequencyScrollbar)
@@ -395,6 +403,9 @@ public void adjustmentValueChanged(AdjustmentEvent e)
     repaint();}
   }
 
+
+
+/* >>> Interfaces not used <<< */
 
 @Override
 public void mouseClicked(MouseEvent e) {}
