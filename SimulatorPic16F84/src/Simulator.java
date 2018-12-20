@@ -8,6 +8,34 @@ public class Simulator {
 	/* TODO: Implement Runtime-Counter */
 	/* TODO: Implement Clock-Generator */
 	
+	
+	/* >>> STATIC-SIMULATOR-VARIABLES <<< */
+	
+	static double runtimeCounter = 0;
+	static double timePerCycle = 1;
+	static double clockFrequency = 4_000_000;
+	//Clock frequency in Hertz
+	//Ranging from 32kHz to 20Mhz
+	// 32.000 - 20.000.000
+	// 4.000.000 = 1 uS
+	// 8.000.000 = 0.5 uS
+	
+	/* >>> STATIC-SIMULATOR-METHODS <<< */
+	
+	//Resets the runtime counter
+	static public void resetRuntimeCounter()
+	{runtimeCounter = 0.0;}
+	
+	//Resets the runtime counter
+	static public void increaseRuntimeCounter()
+	{runtimeCounter += timePerCycle;}
+	
+	//Calculate the current timePerCacle
+	static void calculateCycleTime(long clockFrequency)
+	{Simulator.clockFrequency = clockFrequency;
+	 timePerCycle = ((double)4_000_000/clockFrequency);}
+	
+	
 
 	/* >>> SIMULATOR-VARIABLES <<< */
 	
@@ -51,6 +79,9 @@ public class Simulator {
 	   
 	   //Resetting every Register as part of the initialization
 	   resetController();
+	   
+	   //Resetting runtimeCounter
+	   resetRuntimeCounter();
 	   
 	   System.out.println("====================================================================");
 	   System.out.println("==================== Waiting for User... ===========================");
@@ -111,7 +142,10 @@ public class Simulator {
 	   //Fetch PC (Pipe 2.)
 	   Pic16F84Registers.INSTRUCTION_REGISTER = Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]; 
 	   System.out.println("2.Fetched " + String.format("%2X", Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]) + "h" + " from " + "Program-Memory[" + Pic16F84Registers.PC + "]");  
-	   System.out.println("====================================================================");  
+	   System.out.println("===================================================================="); 
+	   
+	   //Increasing runtimeCounter
+	   increaseRuntimeCounter();
 	  }
 	
 	

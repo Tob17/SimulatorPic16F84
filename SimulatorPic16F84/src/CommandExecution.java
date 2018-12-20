@@ -1243,6 +1243,7 @@ public class CommandExecution {
 	    	Pic16F84Registers.PC = (short)opcAndArguments[1];
 	    	Pic16F84Registers.load2BitPCLATHToPC();
 	    	Pic16F84Registers.loadPCToPCL();
+	    	Simulator.increaseRuntimeCounter();
 			break;
 			
 			
@@ -1261,6 +1262,7 @@ public class CommandExecution {
 			System.out.println("GOTO" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
 			System.out.println("GOTO: " + "Jumping to adress: " + String.format("%2X", opcAndArguments[1]) + "h");
 			Pic16F84Registers.computedGOTO((short)opcAndArguments[1]);
+		  	Simulator.increaseRuntimeCounter();
 			break;	
 			
 			
@@ -1291,6 +1293,7 @@ public class CommandExecution {
 			
 	      case 0x0009:
 	        System.out.println(">>>Not implemented: " + "RETFIE" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");
+	      	Simulator.increaseRuntimeCounter();
 			break;	
 			
 			
@@ -1303,6 +1306,7 @@ public class CommandExecution {
 	    	Pic16F84Registers.PC = Pic16F84Registers.pop();
 	    	Pic16F84Registers.loadPCToPCL();
 	    	Pic16F84Registers.W_REGISTER = (byte)opcAndArguments[1];
+	      	Simulator.increaseRuntimeCounter();
 			break;	
 			
 			
@@ -1314,6 +1318,7 @@ public class CommandExecution {
 			System.out.println("RETURN: " + "Jumping back to: " + String.format("%2X", Pic16F84Registers.STACK[Pic16F84Registers.STACKPOINTER]) + "h");
 	    	Pic16F84Registers.PC = Pic16F84Registers.pop();
 	    	Pic16F84Registers.loadPCToPCL();
+	      	Simulator.increaseRuntimeCounter();
 			break;	
 			
 			

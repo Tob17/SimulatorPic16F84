@@ -1,24 +1,26 @@
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
-
+import java.text.DecimalFormat;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 
 
 
-public class SimulatorGUI extends JPanel implements ActionListener, MouseListener {
-	
-	/* TODO: Implement Runtime-Counter */
-	/* TODO: Implement Clock-Generator */
-	
+public class SimulatorGUI extends JPanel implements ActionListener, MouseListener, AdjustmentListener {
 	
 	
   /* >>> Class-Methods <<< */
@@ -74,6 +76,11 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
   
   TaggedLabel lstLabelList[] = null;
   
+  JLabel runtimeCounterLabel = new JLabel();
+  JLabel clockFrequencyLabel = new JLabel();
+  JScrollBar clockFrequencyScrollbar = new JScrollBar();
+ 
+  
   
   
   /* >>> Object-Methods <<< */
@@ -107,15 +114,19 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  JPanel contentPanel6 = new JPanel();
 	  JPanel contentPanel7 = new JPanel();
 	  JPanel contentPanel8 = new JPanel();
+	  JPanel contentPanel9 = new JPanel();
+	  JPanel contentPanel10 = new JPanel();
 	  
 	  contentPanel1.setBackground(Color.RED);
 	  contentPanel2.setBackground(Color.YELLOW);
 	  contentPanel3.setBackground(Color.GREEN);
 	  contentPanel4.setBackground(Color.BLUE);
-	  contentPanel5.setBackground(Color.CYAN);
+	  contentPanel5.setBackground(Color.WHITE);
 	  contentPanel6.setBackground(Color.BLACK);
 	  contentPanel7.setBackground(Color.WHITE);
-	  contentPanel8.setBackground(Color.ORANGE);  
+	  contentPanel8.setBackground(Color.PINK);  
+	  contentPanel9.setBackground(Color.ORANGE); 
+	  contentPanel10.setBackground(Color.BLUE); 
 	  
 	  setLayout(new GridLayout(1,2, 5, 5));
 	  
@@ -130,7 +141,7 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  layoutPanel1.setLayout(new GridLayout(1,4,5,5));
 	  layoutPanel2.setLayout(new GridLayout(1,1,5,5));
 	  layoutPanel3.setLayout(new GridLayout(2,1,5,5));
-	  layoutPanel4.setLayout(new GridLayout(1,1,5,5));
+	  layoutPanel4.setLayout(new GridLayout(1,3,5,5));
 	  
 	  layoutPanel1.add(contentPanel1);
 	  layoutPanel1.add(contentPanel2);
@@ -140,6 +151,8 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  layoutPanel3.add(contentPanel6);
 	  layoutPanel3.add(contentPanel7);
 	  layoutPanel4.add(contentPanel8);
+	  layoutPanel4.add(contentPanel9);
+	  layoutPanel4.add(contentPanel10);
 	  
 	  contentPanel1.setLayout(new GridLayout(1,1,5,5));
 	  contentPanel2.setLayout(new GridLayout(1,1,5,5));
@@ -148,8 +161,9 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  contentPanel5.setLayout(new GridLayout(1,1,5,5));
 	  contentPanel6.setLayout(new GridLayout(1,1,5,5));
 	  contentPanel7.setLayout(new GridLayout(1,1,5,5));
-	  contentPanel8.setLayout(new GridLayout(1,1,5,5));
-	  
+	  contentPanel8.setLayout(new GridBagLayout());
+	  contentPanel9.setLayout(new GridBagLayout());
+	  contentPanel10.setLayout(new GridLayout(1,1,5,5));
 	  
 	  /* Adding GUI-Content */
 	  
@@ -157,6 +171,24 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  contentPanel2.add(stopButton);
 	  contentPanel3.add(stepButton);
 	  contentPanel4.add(resetButton);
+	  
+	  contentPanel8.add(runtimeCounterLabel);
+	  runtimeCounterLabel.setFont(new Font("Arial", 30, 30));
+	  runtimeCounterLabel.setForeground(Color.WHITE);	
+	  
+	  contentPanel9.add(clockFrequencyLabel);
+	  clockFrequencyLabel.setFont(new Font("Arial", 30, 30));
+	  clockFrequencyLabel.setForeground(Color.WHITE);
+	  clockFrequencyLabel.setText("Example");	  
+	  
+	  
+	  contentPanel10.add(this.clockFrequencyScrollbar);
+	  clockFrequencyScrollbar.setOrientation(JScrollBar.HORIZONTAL);
+	  clockFrequencyScrollbar.setMinimum(32);
+	  clockFrequencyScrollbar.setMaximum(20010);
+	  clockFrequencyScrollbar.setValue(4000);
+	  
+
 	  
 	  initLSTGrid(contentPanel5);
 	  
@@ -167,6 +199,8 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  stepButton.addActionListener(this);
 	  resetButton.addActionListener(this);  
 	  
+	  clockFrequencyScrollbar.addAdjustmentListener(this);
+	  
 	  for(int a = 0; a < lstLabelList.length; a++)
 		  lstLabelList[a].addMouseListener(this);
 	  
@@ -175,7 +209,7 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
   
   //Inits a Panel with an array of labels with the stored last-file-text
   public void initLSTGrid(JPanel LSTPanel)
-    {
+     {
 	  LSTPanel.setLayout(new GridLayout(lstText.length, 1,1,1));
 	  lstLabelList = new TaggedLabel[lstText.length];
 	  
@@ -192,7 +226,7 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	      
 	      LSTPanel.add(lstLabelList[i]);
 	    }
-    }
+     }
   
   
 	//Checking if next next command contains a breakpoint by comparing PC with every Label available in the GUI´s Taggedlabel-list
@@ -255,12 +289,12 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 				  System.out.println("Initializing next Cycle...");
 				  simulator.executeStep();
 				  repaint();
-				  try {Thread.sleep(500);} catch (InterruptedException e1) {}
+				  try {Thread.sleep(50);} catch (InterruptedException e1) {}
 				 }
 			   else
 			     {
 				  System.out.println(">>>Breakpoint reached<<<");
-				  try {Thread.sleep(500);} catch (InterruptedException e1) {}
+				  try {Thread.sleep(50);} catch (InterruptedException e1) {}
 				 }
 			  }
 		  }
@@ -279,6 +313,11 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
     {
 	  super.paint(g);
 	  markLine(Pic16F84Registers.PC, lstLabelList);
+	  
+	  DecimalFormat formating = new DecimalFormat();
+	  formating.setMaximumFractionDigits(2);
+	  runtimeCounterLabel.setText(String.valueOf(formating.format(Simulator.runtimeCounter) + " uS"));
+	  clockFrequencyLabel.setText(String.valueOf((int)Simulator.clockFrequency + " Hz"));
 	}
 
   
@@ -305,7 +344,6 @@ public void actionPerformed(ActionEvent e)
 		/* ************************ Calling Main Routine in a new Thread ************************** */
 		 
 	   });
-	 
 	    mainExecutionThread.start();
 	   }
 	 
@@ -332,8 +370,11 @@ public void actionPerformed(ActionEvent e)
 	 
 	 //Resets the controller by resetting every register
 	 if(e.getSource() == resetButton)
-	   {simulator.resetController();
-		repaint();} 
+	   {
+		simulator.resetController();
+	    Simulator.resetRuntimeCounter();
+		repaint();
+	   } 
 	}
 
 
@@ -347,6 +388,15 @@ public void mousePressed(MouseEvent e)
 
 
 @Override
+public void adjustmentValueChanged(AdjustmentEvent e) 
+  {
+   if(e.getSource() == this.clockFrequencyScrollbar)
+   {Simulator.calculateCycleTime((clockFrequencyScrollbar.getValue()*1000));
+    repaint();}
+  }
+
+
+@Override
 public void mouseClicked(MouseEvent e) {}
 @Override
 public void mouseEntered(MouseEvent e) {}
@@ -354,5 +404,5 @@ public void mouseEntered(MouseEvent e) {}
 public void mouseExited(MouseEvent e) {}
 @Override
 public void mouseReleased(MouseEvent e) {}
-  
+
 }
