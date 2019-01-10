@@ -166,8 +166,7 @@ public class CommandExecution {
 	    	break;
 	    	
 	    	
-	    	/* >-------------------
-	    	 * ----------------------------------------------------< */
+	    	/* >-----------------------------------------------------------------------< */
 	    	
 	      case 0x0100: // CLRF (Set W-Register to 0) 
 	          System.out.println("CLRW" + " Arguments: " + String.format("%2X", opcAndArguments[1]) + "h" + "," + String.format("%2X", opcAndArguments[2]) + "h");

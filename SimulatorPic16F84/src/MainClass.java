@@ -12,7 +12,7 @@ public class MainClass {
 		System.out.println("====================================================================");
 			
 		//Init GUI (GUI inits Simulator aswell)
-		SimulatorGUI.init("./src/LSTFiles/TPicSim2.LST", 0);
+		SimulatorGUI.init("./src/LSTFiles/TPicSim2.LST");
 	}
 
 }

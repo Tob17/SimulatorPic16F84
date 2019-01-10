@@ -26,12 +26,12 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
   /* >>> Class-Methods <<< */
 	
 	
-  public static void init(String filePath, int programPageNumber)  throws IOException 
+  public static void init(String filePath)  throws IOException 
     {
      //Initializing Frame and Main-Panel, while grabbing the Main-Panel
      SimulatorGUI simPane = initFrame();
      //Initializing the Simulator
-     simPane.lstText = simPane.simulator.initSimulator(filePath, programPageNumber); 
+     simPane.lstText = simPane.simulator.initSimulator(filePath); 
      //Setting Layout of the Main-Panel
      simPane.initLayout();
      //Repainting everything after everything has been loaded!

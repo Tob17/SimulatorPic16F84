@@ -52,10 +52,9 @@ public class Simulator {
 	/* >>> SIMULATION <<< */
 	
 	//Inits the Simulator by parsing a file that contains code and writes it to "program". Returns the raw Text-file for other purposes to avoid another parser-call!
-	public String[] initSimulator(String filePath, int page) throws IOException 
+	public String[] initSimulator(String filePath) throws IOException 
 	  {
 	   //Putting everything into the program-memory
-	   Pic16F84Registers.settingProgramPage(page); // selecting custom program-memory page
 	   LSTParser parser; // Parser that reads and extracts code from text-files
 	   System.out.println("====================================================================");	   
 	   parser = new LSTParser(filePath); 

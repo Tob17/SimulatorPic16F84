@@ -33,6 +33,14 @@ public class Pic16F84Registers {
 	// (bit0 = LSB, bit7 = MSB)
 	// bit 7 (+IRP)= bank select	// TODO: How to set IRP in PSW
 	// bit 0-7 = location select
+	static byte PORT_A;
+	// 8 Bit Port
+	static byte TRIS_A;
+	// 8 Bit Direction-Register of Port A
+	static byte PORT_B;
+	// 8 Bit Port
+	static byte TRIS_B;
+	// 8 Bit Direction-Register of Port B
 
 
 	
@@ -70,6 +78,10 @@ public class Pic16F84Registers {
 		STACKPOINTER = -1;
 		INSTRUCTION_REGISTER = -1;
 		FSR = 0;
+		PORT_A = 0;
+		PORT_B = 0;
+		TRIS_A = 0;
+		TRIS_B = 0;
 	}
 
 	
@@ -90,46 +102,6 @@ public class Pic16F84Registers {
 	
 	/* >>> RAM, ROM  AND STACK - Methods <<< */
 	
-	// Sets the Program-Memory-Segment used to store our list of instructions
-	static void settingProgramPage(int pageNumber)
-	{
-		switch(pageNumber)
-		{
-		case 0:
-			PCLATH = 0;
-			load2BitPCLATHToPC();
-			System.out.println("====================================================================");	  
-			System.out.println("Loading program into page 0");	  
-			System.out.println("====================================================================");	  
-			break;
-		case 1:
-			PCLATH = 8;
-			load2BitPCLATHToPC();
-			System.out.println("====================================================================");	  
-			System.out.println("Loading program into page 1");	  
-			System.out.println("====================================================================");	  
-			break;
-		case 2:
-			PCLATH = 16;
-			load2BitPCLATHToPC();
-			System.out.println("====================================================================");	  
-			System.out.println("Loading program into page 2");	  
-			System.out.println("====================================================================");	  
-			break;
-		case 3:
-			PCLATH = 24;
-			load2BitPCLATHToPC();
-			System.out.println("====================================================================");	  
-			System.out.println("Loading program into page 3");	  
-			System.out.println("====================================================================");	  
-			break;
-		default:
-			System.out.println("====================================================================");	  
-			System.out.println("No valid page selected! Loading program into page 0...");	  
-			System.out.println("====================================================================");	
-			break;
-		}
-	}
 
 	//Accesses Data-Registers either in Bank 0 or Bank 1
 	static int readFileRegisterValue(int fileRegisterAdress, int bankSelection)
@@ -235,9 +207,11 @@ public class Pic16F84Registers {
 					PSW = (byte) value;
 				case 0x04: // FSR
 					FSR = (byte) value;
-				case 0x05: // PORTA  TODO: IMPLEMENT!!
+				case 0x05: // PORTA
+					PORT_A = (byte)value;
 					break;
-				case 0x06: // PORTB  TODO: IMPLEMENT!!
+				case 0x06: // PORTB
+					PORT_B = (byte)value;
 					break;
 				case 0x07: //undefined
 					break;
@@ -264,9 +238,11 @@ public class Pic16F84Registers {
 					PSW = (byte) value;
 				case 0x04: // FSR
 					FSR = (byte) value;
-				case 0x05: // TRISA  TODO: IMPLEMENT!!
+				case 0x05: // TRISA
+					TRIS_A = (byte)value;
 					break;
-				case 0x06: // TRISB  TODO: IMPLEMENT!!
+				case 0x06: // TRISB
+					TRIS_B = (byte)value;
 					break;
 				case 0x07: //undefined
 					break;
@@ -332,6 +308,7 @@ public class Pic16F84Registers {
 		decrementStackPointer();
 		return returnValue;
 	}
+	
 	
 	
 	
@@ -438,7 +415,85 @@ public class Pic16F84Registers {
 		//Loading 2-Bit PCLATH
 		load2BitPCLATHToPC();
 	}
-
+	
+	
+	/* >>>  I/O-OPERATIONS <<< */
+	
+	
+	//Updates any PORT-Bit (if pin is declared as input) or Pin (if pin is declared as output)
+	static void updatePortsAndCheckboxes(int[] pinValuesA, int[] pinValuesB)
+	{
+		//Updating Pins which are declared as Inputs
+		for(int i = 0; i < 8; i ++)
+			changePin(pinValuesA[i], i, 'A');
+		for(int i = 0; i < 8; i ++)
+			changePin(pinValuesB[i], i, 'B');
+		
+		//Updating Pins which are declared as Outputs	
+		for(int i = 0; i < 8; i ++)
+		  if(checkIfPinisOutput(i,'A'))
+		   {/*update checkbox value with bit from portB*/}
+		for(int i = 0; i < 8; i ++)
+		  if(checkIfPinisOutput(i,'B'))
+		   {/*update checkbox value with bit from portB*/}
+	}
+	
+	//If a Pin is changed, we write its value into the corresponding PORT-Bit, if the Pin is declared as an input
+	static void changePin(int pinValue, int pinChanged, char portName)
+	//pinChanged: 000 = Pin0, 001 = Pin1,...
+	//pinValue: pin checked or not
+	//portName: PortA or PortB?
+	{
+	 if(portName == 'A' || portName=='a')
+	   {
+		 //Check if TrisA-Pin has a 1 at selected pin -> Input-Pin
+		 if((TRIS_A & (1 << pinChanged)) == 1)
+           {
+			if(pinValue == 1)
+				PORT_A |= 1 << pinChanged;
+			else
+				PORT_A &= ~(1 << pinChanged); 			
+           }
+	   }
+	 else if(portName == 'B' || portName=='b')
+	   {
+		 //Check if TrisB-Pin has a 1 at selected pin -> Input-Pin
+		 if((TRIS_B & (1 << pinChanged)) == 1)
+           {
+			if(pinValue == 1)
+				PORT_B |= 1 << pinChanged;
+			else
+				PORT_B &= ~(1 << pinChanged); 			
+           }
+	   }
+	 else
+		 System.out.println("ERROR: Wrong Port Selected!");
+	}
+	
+	
+	//Checks a pin in a PORT and updates the corresponding checkbox
+	static boolean checkIfPinisOutput(int pinExamined, char portName)
+	//pinExamined: 000 = Pin0, 001 = Pin1,...
+	//portName: PortA or PortB?
+	{
+		if(portName == 'A' || portName=='a')
+		{
+			if((TRIS_A & (1 << pinExamined)) == 0)
+				return true;
+			else
+				return false;
+		}
+		else if(portName == 'B' || portName=='b')
+		  {
+			if((TRIS_B & (1 << pinExamined)) == 0)
+				return true;
+			else
+				return false;
+		  }
+		
+		else
+		return false;
+	}
 
 
 
@@ -524,6 +579,16 @@ public class Pic16F84Registers {
 	//Prints Instruction-Register
 	static void printInstructionRegister()
 	{System.out.println("Instruction-Register = " + String.format("%2X", INSTRUCTION_REGISTER) + "h");}
+	
+	//Prints both PORTS
+	static void printPORTS()
+	{System.out.println("PORTA-Register = " + String.format("%2X", PORT_A) + "h");
+	 System.out.println("PORTB-Register = " + String.format("%2X", PORT_B) + "h");}
+	
+	//Prints both TRIS-Registers
+	static void printTRIS()
+	{System.out.println("TRISA-Register = " + String.format("%2X", TRIS_A) + "h");
+	 System.out.println("TRISB-Register = " + String.format("%2X", TRIS_B) + "h");}
 
 	//Prints all Registers
 	static void printAllRegisters()
@@ -536,6 +601,8 @@ public class Pic16F84Registers {
 		printStackpointer();
 		printFSR();
 		printInstructionRegister();
+		printPORTS();
+		printTRIS();
 		System.out.println("===================================================================="); 
 	}	
 
