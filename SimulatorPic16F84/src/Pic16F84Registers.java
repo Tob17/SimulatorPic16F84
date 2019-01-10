@@ -436,6 +436,11 @@ public class Pic16F84Registers {
 		for(int i = 0; i < 8; i ++)
 		  if(checkIfPinisOutput(i,'B'))
 		   {/*update checkbox value with bit from portB*/}
+		
+		 System.out.println("============================================================");
+		 printPORTS();
+		 printTRIS();
+		 System.out.println("============================================================");
 	}
 	
 	//If a Pin is changed, we write its value into the corresponding PORT-Bit, if the Pin is declared as an input
