@@ -5,8 +5,8 @@ public class Simulator {
 	
 	
 	/* TODO: Implement interruption of an execution and dealing with an interupt separativly */
-	/* TODO: Implement Runtime-Counter */
-	/* TODO: Implement Clock-Generator */
+	/* TODO: Implement Timer0 Interrupt */
+	/* Implement RB4-RB7 interrupts */
 	
 	
 	/* >>> STATIC-SIMULATOR-VARIABLES <<< */
@@ -19,6 +19,7 @@ public class Simulator {
 	// 32.000 - 20.000.000
 	// 4.000.000 = 1 uS
 	// 8.000.000 = 0.5 uS
+	
 	
 	/* >>> STATIC-SIMULATOR-METHODS <<< */
 	
@@ -56,22 +57,22 @@ public class Simulator {
 	  {
 	   //Putting everything into the program-memory
 	   LSTParser parser; // Parser that reads and extracts code from text-files
-	   System.out.println("====================================================================");	   
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");	   
 	   parser = new LSTParser(filePath); 
-	   System.out.println("====================================================================");	   
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");	   
 	   String[] text = parser.readFile();
 	   parser.printFile(text);
-	   System.out.println("====================================================================");
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");
 	   String[] codeText = parser.extractCodeline(text);
 	   parser.printFile(codeText);
-	   System.out.println("====================================================================");
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");
 	   String[] programAsStrings = parser.extractCommandsFromStrings(codeText);
 	   parser.printFile(programAsStrings);
-	   System.out.println("====================================================================");
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");
 	   //Copying extracted program into a static Program-Memory
 	   loadProgramIntoProgramMemory(parser.convertStringCommandsToInteger(programAsStrings));
 	   parser.closeFile();
-	   System.out.println("====================================================================");
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");
 	   
 	   //Setting the amount of Cycles the CPU should run on the code parsed above
 	   amountOfCPUCycles = programAsStrings.length;
@@ -82,9 +83,9 @@ public class Simulator {
 	   //Resetting runtimeCounter
 	   resetRuntimeCounter();
 	   
-	   System.out.println("====================================================================");
-	   System.out.println("==================== Waiting for User... ===========================");
-	   System.out.println("====================================================================");
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");
+	   SimulatorGUI.consoleOutput.append("==================== Waiting for User... ===========================\n");
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");
 	   
 	   return text;
 	  }
@@ -102,16 +103,16 @@ public class Simulator {
 	//Resets every Register found in the Pic16F84-Controller
 	public void resetController()
 	  {	
-	   System.out.println("Resetting Registers...");
-	   System.out.println("====================================================================");
+	   SimulatorGUI.consoleOutput.append("Resetting Registers...\n");
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");
 	   Pic16F84Registers.initRegisters();
 	   Pic16F84Registers.initMemory();
-	   System.out.println("========================= Memory whiped! ===========================");
-	   System.out.println("====================================================================");
+	   SimulatorGUI.consoleOutput.append("========================= Memory whiped! ===========================\n");
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");
 		   
 	   Pic16F84Registers.printAllFlags();
 	   Pic16F84Registers.printAllRegisters();
-	   System.out.println("====================================================================");   
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");   
 	  }
 	
 	
@@ -124,24 +125,24 @@ public class Simulator {
 	   //Execute PC-1 (Pipe 1.)
 	   if(Pic16F84Registers.INSTRUCTION_REGISTER != -1)
 	     {
-		  System.out.println("1.Execute " + String.format("%2X", Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]) + "h" + " from " + "Program-Memory[" + Pic16F84Registers.PC + "]");
-		  System.out.println("====================================================================");  
+		  SimulatorGUI.consoleOutput.append("1.Execute " + String.format("%2X", Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]) + "h" + " from " + "Program-Memory[" + Pic16F84Registers.PC + "]\n");
+		  SimulatorGUI.consoleOutput.append("====================================================================\n");  
 	      CommandExecution.execute(Pic16F84Registers.INSTRUCTION_REGISTER);
 		  Pic16F84Registers.printAllFlags();
-		  Pic16F84Registers.printAllRegisters();
+		  SimulatorGUI.consoleOutput.append("====================================================================\n"); 
 		  Pic16F84Registers.printDataMemory();
-		  System.out.println("====================================================================");  
+		  SimulatorGUI.consoleOutput.append("====================================================================\n");  
 	     }
 	   else
 	     {
-		  System.out.println("====================================================================");
-		  System.out.println("1.Instruction-Register is empty!");  
-		  System.out.println("====================================================================");  
+		  SimulatorGUI.consoleOutput.append("====================================================================\n");
+		  SimulatorGUI.consoleOutput.append("1.Instruction-Register is empty!\n");  
+		  SimulatorGUI.consoleOutput.append("====================================================================\n");  
 	     }
 	   //Fetch PC (Pipe 2.)
 	   Pic16F84Registers.INSTRUCTION_REGISTER = Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]; 
-	   System.out.println("2.Fetched " + String.format("%2X", Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]) + "h" + " from " + "Program-Memory[" + Pic16F84Registers.PC + "]");  
-	   System.out.println("===================================================================="); 
+	   SimulatorGUI.consoleOutput.append("2.Fetched " + String.format("%2X", Pic16F84Registers.PROGRAM_MEMORY[Pic16F84Registers.PC]) + "h" + " from " + "Program-Memory[" + Pic16F84Registers.PC + "]\n");  
+	   SimulatorGUI.consoleOutput.append("====================================================================\n"); 
 	   
 	   //Increasing runtimeCounter
 	   increaseRuntimeCounter();

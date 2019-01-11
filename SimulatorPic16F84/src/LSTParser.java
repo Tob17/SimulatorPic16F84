@@ -21,12 +21,12 @@ public class LSTParser {
 	    { 
 		  reader = new FileReader(fileName);
 	      bufferedReader = new BufferedReader(reader);
-	      System.out.println(">>File found and read!");
+	      SimulatorGUI.consoleOutput.append(">>File found and read!\n");
 	     }
 	   catch(FileNotFoundException e) 
 	     {
-		   System.out.println(">>ERROR: File not found!!");
-		   System.out.println(e);
+		   SimulatorGUI.consoleOutput.append(">>ERROR: File not found!!\n");
+		   SimulatorGUI.consoleOutput.append(e + "\n");
 	     };
       }
   
@@ -36,7 +36,7 @@ public class LSTParser {
     // Reading file as text
     public String[] readFile() throws IOException
     {	 
-	 System.out.println("Reading Textfile...");
+	 SimulatorGUI.consoleOutput.append("Reading Textfile...\n");
 	 if(reader != null && bufferedReader != null)	// When a file has been found
        {
 		int i = 0;	// Count how many line does this data have
@@ -64,7 +64,7 @@ public class LSTParser {
     // Extracting and cutting machine code from codeFile[] (a plain text)
     public String[] extractCodeline(String[] textFile) 
      {
-	  System.out.println("Extracting Codelines...");
+	  SimulatorGUI.consoleOutput.append("Extracting Codelines...\n");
       String[] codeString = new String[textFile.length]; // first cutting of the text
       int codeLineCounter = 0; // counts the lines which contain actual code
     	
@@ -104,7 +104,7 @@ public class LSTParser {
     //Extracts commands in an assembly line of machinecode
     public String[] extractCommandsFromStrings(String[] codeLines)
      {
-	   System.out.println("Extracting Commands...");
+	   SimulatorGUI.consoleOutput.append("Extracting Commands...\n");
 	   //Index of Array = Adresses, Value = Commands
 	   String[] programStorage = new String[codeLines.length];
 	   
@@ -129,7 +129,7 @@ public class LSTParser {
     public void printFile(String[] textFile)
      {
 		for(int i = 0; i < textFile.length; i++)
-			System.out.println(textFile[i]);
+			SimulatorGUI.consoleOutput.append(textFile[i] + "\n");
      }
    
     // Closes file that has been opened
@@ -138,11 +138,11 @@ public class LSTParser {
 	  try 
 	    {
 		 bufferedReader.close();
-	     System.out.println(">>File closed!");
+	     SimulatorGUI.consoleOutput.append(">>File closed!\n");
 	    } 
 	  catch (IOException e) 
 	    {
-		 System.out.println(">>ERROR: Can�t close File!!");
+		 SimulatorGUI.consoleOutput.append(">>ERROR: Can�t close File!!\n");
 		 e.printStackTrace();
 		}
 	 }

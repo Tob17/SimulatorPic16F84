@@ -1,8 +1,8 @@
 public class Pic16F84Registers {
 
-	/* TODO: Adding Tris-Register and operations */
-	/* TODO: Adding Port-Registers and operations */
+	
 	/* TODO: Adding Option-Register and operations */
+	/* TODO: Adding Timer0 Register and functionality */
 	
 	/* >>> REGISTERS <<< */
 
@@ -31,16 +31,20 @@ public class Pic16F84Registers {
 	static byte FSR;
 	// 8 Bit File-Select-Register
 	// (bit0 = LSB, bit7 = MSB)
-	// bit 7 (+IRP)= bank select	// TODO: How to set IRP in PSW
-	// bit 0-7 = location select
-	static byte PORT_A;
-	// 8 Bit Port
-	static byte TRIS_A;
-	// 8 Bit Direction-Register of Port A
-	static byte PORT_B;
-	// 8 Bit Port
-	static byte TRIS_B;
+	// bit 7 (+IRP) = bank select
+	// bit 0-6 = location select
+	static byte PORT_A_REGISTER;
+	// 5 Bit Port Register
+	static byte TRIS_A_REGISTER;
+	// 5 Bit Direction-Register of Port A
+	static byte PORT_A_PINS;
+	// 5 Bit value for every output-pin on Port A
+	static byte PORT_B_REGISTER;
+	// 8 Bit Port Register
+	static byte TRIS_B_REGISTER;
 	// 8 Bit Direction-Register of Port B
+	static byte PORT_B_PINS;
+	// 8 Bit value for every output-pin on Port B
 
 
 	
@@ -78,10 +82,12 @@ public class Pic16F84Registers {
 		STACKPOINTER = -1;
 		INSTRUCTION_REGISTER = -1;
 		FSR = 0;
-		PORT_A = 0;
-		PORT_B = 0;
-		TRIS_A = 0;
-		TRIS_B = 0;
+		PORT_A_REGISTER = 0;
+		PORT_B_REGISTER = 0;
+		TRIS_A_REGISTER = 0;
+		TRIS_B_REGISTER = 0;
+		PORT_A_PINS = 0;
+		PORT_B_PINS = 0;
 	}
 
 	
@@ -123,11 +129,11 @@ public class Pic16F84Registers {
 					return PSW;
 				case 0x04: // FSR
 					return FSR;
-				case 0x05: // PORTA  TODO: IMPLEMENT!!
-					return -1;
-				case 0x06: // PORTB  TODO: IMPLEMENT!!
-					return -1;
-				case 0x07: //undefined
+				case 0x05: // PORTA (reads the pins instead of the port-latch)
+					return PORT_A_PINS;
+				case 0x06: // PORTB (reads the pins instead of the port-latch))
+					return PORT_B_PINS;
+				case 0x07: //UNDEFINED
 					return 0;
 				case 0x08: //EEDATA  TODO: IMPLEMENT!!
 					return -1;
@@ -154,11 +160,11 @@ public class Pic16F84Registers {
 					return PSW;
 				case 0x04: // FSR
 					return FSR;
-				case 0x05: // TRISA  TODO: IMPLEMENT!!
-					return -1;
-				case 0x06: // TRISB  TODO: IMPLEMENT!!
-					return -1;
-				case 0x07: //undefined
+				case 0x05: // TRISA
+					return TRIS_A_REGISTER;
+				case 0x06: // TRISB
+					return TRIS_B_REGISTER;
+				case 0x07: //UNDEFINED
 					return -1;
 				case 0x08: //EECON1  TODO: IMPLEMENT!!
 					return -1;
@@ -173,13 +179,13 @@ public class Pic16F84Registers {
 				}
 		} 
 		//General Purpose Registers...
-		else if ((fileRegisterAdress % 128) >= 0x0C && (fileRegisterAdress % 128) <= 0x4F)
+		else if (((fileRegisterAdress % 128) >= 0x0C && (fileRegisterAdress % 128) <= 0x4F) || ((fileRegisterAdress % 128) >= 0x8C && (fileRegisterAdress % 128) <= 0xCF))
 		  {
 			//...always accessed from Bank 0 (Bank 1 is identical to Bank 0) 
 				return RAM_BANK_0[fileRegisterAdress % 128];
 		  }
 		else
-			System.out.println(">>>FATAL ERRROR: Tried to access non implemented RAM!");
+			SimulatorGUI.consoleOutput.append(">>>FATAL ERRROR: Tried to access non implemented RAM!\n");
 		
 		//If no register has been addressed
 		return -1;   	
@@ -205,13 +211,17 @@ public class Pic16F84Registers {
 					break;
 				case 0x03: // STATUS
 					PSW = (byte) value;
+					break;
 				case 0x04: // FSR
 					FSR = (byte) value;
+					break;
 				case 0x05: // PORTA
-					PORT_A = (byte)value;
+					PORT_A_REGISTER = (byte)value;
+					writePortsToPins();
 					break;
 				case 0x06: // PORTB
-					PORT_B = (byte)value;
+					PORT_B_REGISTER = (byte)value;
+					writePortsToPins();
 					break;
 				case 0x07: //undefined
 					break;
@@ -234,15 +244,20 @@ public class Pic16F84Registers {
 					break;
 				case 0x02: // PCL
 					PCL = (byte) value;
+					break;
 				case 0x03: // STATUS
 					PSW = (byte) value;
+					break;
 				case 0x04: // FSR
 					FSR = (byte) value;
+					break;
 				case 0x05: // TRISA
-					TRIS_A = (byte)value;
+					TRIS_A_REGISTER = (byte)value;
+					writePortsToPins();
 					break;
 				case 0x06: // TRISB
-					TRIS_B = (byte)value;
+					TRIS_B_REGISTER = (byte)value;
+					writePortsToPins();
 					break;
 				case 0x07: //undefined
 					break;
@@ -257,14 +272,14 @@ public class Pic16F84Registers {
 				}
 		}
 		//General Purpose Registers...
-		else if ((fileRegisterAdress % 128) >= 0x0C && (fileRegisterAdress % 128) <= 0x4F)
+		else if (((fileRegisterAdress % 128) >= 0x0C && (fileRegisterAdress % 128) <= 0x4F)  || ((fileRegisterAdress % 128) >= 0x8C && (fileRegisterAdress % 128) <= 0xCF))
 		  {
 			//...are allways written to in Bank 0 and Bank 1 simultanously
 				RAM_BANK_0[fileRegisterAdress % 128] = (byte)value;    
 				RAM_BANK_1[fileRegisterAdress % 128] = (byte)value; 
 		  }
 		else
-		  System.out.println(">>>FATAL ERRROR: Tried to access non implemented RAM!");
+		  SimulatorGUI.consoleOutput.append(">>>FATAL ERRROR: Tried to access non implemented RAM!\n");
 	}
 	
 	//Increments the stackpointer and sets it to 0 if it exceeds the 8-Level-Stack (circular puffer)
@@ -385,10 +400,10 @@ public class Pic16F84Registers {
 		{
 			PC = (short)(PC & 0b1100000000000);
 			loadPCToPCL();
-			System.out.println("====================================================================");  
-			System.out.println("Warning: PC overflowed and resetted to 0");
-			System.out.println("Starting with first line again...");
-			System.out.println("====================================================================");  
+			SimulatorGUI.consoleOutput.append("====================================================================\n");  
+			SimulatorGUI.consoleOutput.append("Warning: PC overflowed and resetted to 0\n");
+			SimulatorGUI.consoleOutput.append("Starting with first line again...\n");
+			SimulatorGUI.consoleOutput.append("====================================================================\n");  
 		}    	
 	}
 
@@ -417,87 +432,146 @@ public class Pic16F84Registers {
 	}
 	
 	
+	
 	/* >>>  I/O-OPERATIONS <<< */
 	
 	
 	//Updates any PORT-Bit (if pin is declared as input) or Pin (if pin is declared as output)
-	static void updatePortsAndCheckboxes(int[] pinValuesA, int[] pinValuesB)
+	static void writePortsToPins()
 	{
-		//Updating Pins which are declared as Inputs
+		for(int i = 0; i < 5; i ++)
+		  {int portBitValue = (PORT_A_REGISTER & (1 << i)) >> i;
+			writePortBitToPin(portBitValue, i, 'A');}
 		for(int i = 0; i < 8; i ++)
-			changePin(pinValuesA[i], i, 'A');
-		for(int i = 0; i < 8; i ++)
-			changePin(pinValuesB[i], i, 'B');
+		  {int portBitValue = (PORT_B_REGISTER & (1 << i)) >> i;
+			writePortBitToPin(portBitValue, i, 'B');}
 		
-		//Updating Pins which are declared as Outputs	
-		for(int i = 0; i < 8; i ++)
-		  if(checkIfPinisOutput(i,'A'))
-		   {/*update checkbox value with bit from portB*/}
-		for(int i = 0; i < 8; i ++)
-		  if(checkIfPinisOutput(i,'B'))
-		   {/*update checkbox value with bit from portB*/}
-		
-		 System.out.println("============================================================");
+		 SimulatorGUI.consoleOutput.append("============================================================\n");
 		 printPORTS();
 		 printTRIS();
-		 System.out.println("============================================================");
+		 printPINS();
+		 SimulatorGUI.consoleOutput.append("============================================================\n");
 	}
 	
+	
+	//Sets a selected pin of either PORT-A or PORT-B
+	static void setPin(int pinChanged, char portName)
+	  {
+	   if(portName == 'A' || portName=='a')
+		  PORT_A_PINS |= 1 << pinChanged;
+	   if(portName == 'B' || portName=='b')
+		 PORT_B_PINS |= 1 << pinChanged;
+	   
+	   writePinToPortBit(1, pinChanged, portName);
+	  }
+	
+	
+	//Resets a selected pin of either PORT-A or PORT-B
+	static void resetPin(int pinChanged, char portName)
+	  {
+	   if(portName == 'A' || portName=='a')
+		 PORT_A_PINS &= ~(1 << pinChanged);
+	   if(portName == 'B' || portName=='b')
+		 PORT_B_PINS &= ~(1 << pinChanged);
+	   
+	   writePinToPortBit(0, pinChanged, portName);
+	  }
+	
 	//If a Pin is changed, we write its value into the corresponding PORT-Bit, if the Pin is declared as an input
-	static void changePin(int pinValue, int pinChanged, char portName)
 	//pinChanged: 000 = Pin0, 001 = Pin1,...
 	//pinValue: pin checked or not
-	//portName: PortA or PortB?
+	//portName: PortA or PortB?	
+	static void writePinToPortBit(int pinValue, int pinChanged, char portName)
 	{
 	 if(portName == 'A' || portName=='a')
 	   {
-		 //Check if TrisA-Pin has a 1 at selected pin -> Input-Pin
-		 if((TRIS_A & (1 << pinChanged)) == 1)
+		 //Check if TRIS-A-Pin has a 1 at selected pin -> Input-Pin
+		 if(((TRIS_A_REGISTER & (1 << pinChanged)) >> pinChanged) == 1)
            {
+			//Write value 1 to PORT-REGISTER-Bit
 			if(pinValue == 1)
-				PORT_A |= 1 << pinChanged;
+			   PORT_A_REGISTER |= 1 << pinChanged;
+			//Write value 0 to PORT-REGISTER-Bit
 			else
-				PORT_A &= ~(1 << pinChanged); 			
+			   PORT_A_REGISTER &= ~(1 << pinChanged); 	
            }
+		 //If not, then TRIS-A-Bit has been set to 0 and declared as an Output-Pin, rewriting the value set on the pin with the PORT-A-Bit
+		 else
+		   {
+		    int portBitValue = (PORT_A_REGISTER & (1 << pinChanged)) >> pinChanged;
+		    writePortBitToPin(portBitValue, pinChanged, portName);
+		   }
 	   }
 	 else if(portName == 'B' || portName=='b')
 	   {
-		 //Check if TrisB-Pin has a 1 at selected pin -> Input-Pin
-		 if((TRIS_B & (1 << pinChanged)) == 1)
+		 //Check if TRIS-B-Pin has a 1 at selected pin -> Input-Pin
+		 if(((TRIS_B_REGISTER & (1 << pinChanged)) >> pinChanged) == 1)
            {
+			//Write value 1 to Port-Pin
 			if(pinValue == 1)
-				PORT_B |= 1 << pinChanged;
+				PORT_B_REGISTER |= 1 << pinChanged;
+			//Write value 0 to Port-Pin
 			else
-				PORT_B &= ~(1 << pinChanged); 			
+				PORT_B_REGISTER &= ~(1 << pinChanged); 			
            }
+		 //If not, then TRIS-B-Bit has been set to 0 and declared as an Output-Pin, rewriting the value set on the pin with the PORT-B-Bit
+		 else
+		   {
+		    int portBitValue = (PORT_B_REGISTER & (1 << pinChanged)) >> pinChanged;
+		    writePortBitToPin(portBitValue, pinChanged, portName);
+		   }
 	   }
 	 else
-		 System.out.println("ERROR: Wrong Port Selected!");
+		 SimulatorGUI.consoleOutput.append("ERROR: Wrong Port Selected!\n");
 	}
 	
 	
-	//Checks a pin in a PORT and updates the corresponding checkbox
-	static boolean checkIfPinisOutput(int pinExamined, char portName)
-	//pinExamined: 000 = Pin0, 001 = Pin1,...
-	//portName: PortA or PortB?
+	//If a Port-Bit is changed, we write its value into the corresponding Pin, if the Pin is declared as an output
+	//pinChanged: 000 = Pin0, 001 = Pin1,...
+	//pinValue: pin checked or not
+	//portName: PortA or PortB?	
+	static void writePortBitToPin(int pinValue, int pinChanged, char portName)
 	{
-		if(portName == 'A' || portName=='a')
-		{
-			if((TRIS_A & (1 << pinExamined)) == 0)
-				return true;
-			else
-				return false;
-		}
-		else if(portName == 'B' || portName=='b')
-		  {
-			if((TRIS_B & (1 << pinExamined)) == 0)
-				return true;
-			else
-				return false;
-		  }
-		
+	 if(portName == 'A' || portName=='a')
+	   {
+	    //Check if TRIS-A-Pin has a 0 at selected pin -> Output-Pin
+		if(((TRIS_A_REGISTER & (1 << pinChanged)) >> pinChanged) == 0)
+          {
+		   //Write value 1 to PORT-REGISTER-Bit
+		   if(pinValue == 1)
+		     PORT_A_PINS |= 1 << pinChanged;
+		   //Write value 0 to PORT-REGISTER-Bit
+		   else
+			 PORT_A_PINS &= ~(1 << pinChanged); 	
+          }
+		//If not, then TRIS-A-Bit has been set to 1 and declared as an Input-Pin, rewriting the value set on the Port-Bit with the value on the corresponding pin
 		else
-		return false;
+		  {
+		   int pinBitValue = (PORT_A_PINS & (1 << pinChanged)) >> pinChanged;
+		   writePinToPortBit(pinBitValue, pinChanged, portName);
+		  }
+	   }
+	 else if(portName == 'B' || portName=='b')
+	   {
+		//Check if TRIS-B-Pin has a 0 at selected pin -> Output-Pin
+		if(((TRIS_B_REGISTER & (1 << pinChanged)) >> pinChanged) == 0)
+	      {
+		   //Write value 1 to PORT-REGISTER-Bit
+		   if(pinValue == 1)
+			 PORT_B_PINS |= 1 << pinChanged;
+		   //Write value 0 to PORT-REGISTER-Bit
+		   else
+			 PORT_B_PINS &= ~(1 << pinChanged); 	
+	      }
+		//If not, then TRIS-A-Bit has been set to 1 and declared as an Input-Pin, rewriting the value set on the Port-Bit with the value on the corresponding pin
+		else
+		  {
+		   int pinBitValue = (PORT_B_PINS & (1 << pinChanged)) >> pinChanged;
+		   writePinToPortBit(pinBitValue, pinChanged, portName);
+		  }
+	   }
+	 else
+		 SimulatorGUI.consoleOutput.append("ERROR: Wrong Port Selected!\n");
 	}
 
 
@@ -551,49 +625,65 @@ public class Pic16F84Registers {
 
 	//Prints all flags
 	static void printAllFlags()
-	{System.out.println("*C-Flag = " + (PSW & (1)) + " *DC-Flag = " + (PSW >> 1 & (1))+ " *Z-Flag = " + (PSW >> 2 & (1)) );}
+	{SimulatorGUI.consoleOutput.append("*C-Flag = " + (PSW & (1)) + " *DC-Flag = " + (PSW >> 1 & (1))+ " *Z-Flag = " + (PSW >> 2 & (1)) + "\n");}
 
 	//Prints PSW
 	static void printPSW()
-	{System.out.println("PSW = " + String.format("%2X", PSW) + "h");}
+	{SimulatorGUI.consoleOutput.append("PSW = " + String.format("%2X", PSW) + "h\n");}
 
 	//Prints Working-Register (W)
 	static void printWRegister()
-	{System.out.println("W-Register = " + String.format("%2X", W_REGISTER) + "h");}	
+	{SimulatorGUI.consoleOutput.append("W-Register = " + String.format("%2X", W_REGISTER) + "h\n");}	
 
 	//Prints PC
 	static void printPC()
-	{System.out.println("PC = " + String.format("%2X", PC) + "h");}	
+	{SimulatorGUI.consoleOutput.append("PC = " + String.format("%2X", PC) + "h\n");}	
 
 	//Prints Stackpointer
 	static void printStackpointer()
-	{System.out.println("STACKPOINTER = " + String.format("%2X", STACKPOINTER) + "h");}	
+	{SimulatorGUI.consoleOutput.append("STACKPOINTER = " + String.format("%2X", STACKPOINTER) + "h\n");}	
 
 	//Prints PCL
 	static void printPCL()
-	{System.out.println("PCL = " + String.format("%2X", PCL) + "h");}	
+	{SimulatorGUI.consoleOutput.append("PCL = " + String.format("%2X", PCL) + "h\n");}	
 
 	//Prints PCLATH
 	static void printPCLATH()
-	{System.out.println("PCLATH = " + String.format("%2X", PCLATH) + "h");}
+	{SimulatorGUI.consoleOutput.append("PCLATH = " + String.format("%2X", PCLATH) + "h\n");}
 
 	//Prints FSR
 	static void printFSR()
-	{System.out.println("FSR = " + String.format("%2X", FSR) + "h");}	
+	{SimulatorGUI.consoleOutput.append("FSR = " + String.format("%2X", FSR) + "h\n");}	
 
 	//Prints Instruction-Register
 	static void printInstructionRegister()
-	{System.out.println("Instruction-Register = " + String.format("%2X", INSTRUCTION_REGISTER) + "h");}
+	{SimulatorGUI.consoleOutput.append("Instruction-Register = " + String.format("%2X", INSTRUCTION_REGISTER) + "h\n");}
 	
 	//Prints both PORTS
 	static void printPORTS()
-	{System.out.println("PORTA-Register = " + String.format("%2X", PORT_A) + "h");
-	 System.out.println("PORTB-Register = " + String.format("%2X", PORT_B) + "h");}
+	{SimulatorGUI.consoleOutput.append("PORTA-Register = " + String.format("%2X", PORT_A_REGISTER) + "h\n");
+	 SimulatorGUI.consoleOutput.append("PORTB-Register = " + String.format("%2X", PORT_B_REGISTER) + "h\n");}
 	
 	//Prints both TRIS-Registers
 	static void printTRIS()
-	{System.out.println("TRISA-Register = " + String.format("%2X", TRIS_A) + "h");
-	 System.out.println("TRISB-Register = " + String.format("%2X", TRIS_B) + "h");}
+	{SimulatorGUI.consoleOutput.append("TRISA-Register = " + String.format("%2X", TRIS_A_REGISTER) + "h\n");
+	 SimulatorGUI.consoleOutput.append("TRISB-Register = " + String.format("%2X", TRIS_B_REGISTER) + "h\n");}
+	
+	//Prints both PORT-OUTPUT-PINS
+	static void printPINS()
+	{SimulatorGUI.consoleOutput.append("PORTA-PINS = " + String.format("%2X", PORT_A_PINS) + "h\n");
+	 SimulatorGUI.consoleOutput.append("PORTB-PINS = " + String.format("%2X", PORT_B_PINS) + "h\n");}
+	
+	static void printAllIORegisters()
+	  {
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");
+	   SimulatorGUI.consoleOutput.append("======================= Current I/O State ==========================\n");	
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");	
+       printPORTS();
+	   printTRIS();
+	   printPINS();
+	   SimulatorGUI.consoleOutput.append("====================================================================\n");	
+	  }
 
 	//Prints all Registers
 	static void printAllRegisters()
@@ -608,7 +698,8 @@ public class Pic16F84Registers {
 		printInstructionRegister();
 		printPORTS();
 		printTRIS();
-		System.out.println("===================================================================="); 
+		printPINS();
+		SimulatorGUI.consoleOutput.append("====================================================================\n"); 
 	}	
 
 
@@ -619,36 +710,42 @@ public class Pic16F84Registers {
 	//Prints program memory
 	static void printProgramMemory()
 	{
-		System.out.println(">>> Content of the Program-Memory");
-		System.out.println("===================================================================="); 
+		SimulatorGUI.consoleOutput.append(">>> Content of the Program-Memory\n");
+		SimulatorGUI.consoleOutput.append("====================================================================\n"); 
 		for(int i = 0; i < PROGRAM_MEMORY.length; i++)
 		{
-		 System.out.print(i + ". " + String.format("%2X", PROGRAM_MEMORY[i]) + "h" + "      ");
+		 SimulatorGUI.consoleOutput.append(i + ". " + String.format("%2X", PROGRAM_MEMORY[i]) + "h" + "      \n");
 		 if((i % 10) == 0)
-			 System.out.println();
+			 SimulatorGUI.consoleOutput.append("\n");
 		}
-		System.out.println();
+		SimulatorGUI.consoleOutput.append("\n");
 	}
 
 	//prints data memory
 	static void printDataMemory()
-	{
-		System.out.println(">>> Content of the Data-Memory in Bank 0 and Bank 1");
-		System.out.println("===================================================================="); 
+	{	
+		SimulatorGUI.consoleOutput.append(">>> Content of the Data-Memory in Bank 0 and Bank 1\n");
+		SimulatorGUI.consoleOutput.append("====================================================================\n"); 
+		
+		String printedLine = "";
 		for(int i = 12; i < 80; i++)
 		  {
-		   System.out.print(i + ". " + String.format("%2X", RAM_BANK_0[i]) + "h" + "      ");
+		    
+		   printedLine += i + ". " + String.format("%2X", RAM_BANK_0[i]) + "h" + "      ";
 		   if(((i - 11) % 6) == 0)
-			   System.out.println();
+		     {
+			  SimulatorGUI.consoleOutput.append(printedLine + "\n");
+			  printedLine = "";
+		     }
 		  }	
-		System.out.println();
+		SimulatorGUI.consoleOutput.append("\n");
 	}
 
 	//prints stack
 	static void printStack()
 	{
-		System.out.println(">>> Content of the Stack");
+		SimulatorGUI.consoleOutput.append(">>> Content of the Stack\n");
 		for(int i = 0; i < STACK.length; i++)
-			System.out.println(i + ". " + String.format("%2X", STACK[i]) + "h");
+			SimulatorGUI.consoleOutput.append(i + ". " + String.format("%2X", STACK[i]) + "h\n");
 	}
 }

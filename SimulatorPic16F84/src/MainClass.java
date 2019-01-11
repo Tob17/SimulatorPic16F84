@@ -7,12 +7,12 @@ public class MainClass {
 
 	public static void main(String[] abc)  throws IOException 
 	{		
-		System.out.println("====================================================================");
-		System.out.println("==================Starting Simulator Pic16F84=======================");
-		System.out.println("====================================================================");
+		SimulatorGUI.consoleOutput.append("====================================================================\n");
+		SimulatorGUI.consoleOutput.append("==================Starting Simulator Pic16F84=======================\n");
+		SimulatorGUI.consoleOutput.append("====================================================================\n");
 			
 		//Init GUI (GUI inits Simulator aswell)
-		SimulatorGUI.init("./src/LSTFiles/TPicSim2.LST");
+		SimulatorGUI.init("./src/LSTFiles/TPicSim10.LST");	
 	}
 
 }

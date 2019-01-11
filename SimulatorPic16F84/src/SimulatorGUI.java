@@ -7,20 +7,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.text.DefaultCaret;
 
 
-
-public class SimulatorGUI extends JPanel implements ActionListener, MouseListener, AdjustmentListener {
+public class SimulatorGUI extends JPanel implements ActionListener, MouseListener, AdjustmentListener, ItemListener {
 	
 	
   /* >>> Class-Methods <<< */
@@ -42,7 +47,7 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
   // Creating and initializing a Frame that hold our GUI
   public static SimulatorGUI initFrame()
     {
-	 JFrame simulatorWindow = new JFrame("Simulator");
+	 JFrame simulatorWindow = new JFrame("Simulator Pic16F84");
 	 SimulatorGUI simulatorContentPane = new SimulatorGUI();
 		
 	 //Adding a main-pane into the Frame and setting sizes and visibility
@@ -55,9 +60,15 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	}
   
   
+  /* >>> Class-Objects <<< */
+  
+  //Global, static JTextArea which catches console-outputs (System.out.print(...))
+  public static JTextArea consoleOutput = new JTextArea();
+  
   
   
   /* >>> Object-Variables <<< */
+  
   
   //Simulator-Object
   Simulator simulator = new Simulator();
@@ -79,6 +90,44 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
   JLabel runtimeCounterLabel = new JLabel();
   JLabel clockFrequencyLabel = new JLabel();
   JScrollBar clockFrequencyScrollbar = new JScrollBar();
+  
+  JCheckBox portAPin0 = new JCheckBox("portAPin0");
+  JCheckBox portAPin1 = new JCheckBox("portAPin1");
+  JCheckBox portAPin2 = new JCheckBox("portAPin2");
+  JCheckBox portAPin3 = new JCheckBox("portAPin3");
+  JCheckBox portAPin4 = new JCheckBox("portAPin4");
+  
+  JCheckBox portBPin0 = new JCheckBox("portBPin0");
+  JCheckBox portBPin1 = new JCheckBox("portBPin1");
+  JCheckBox portBPin2 = new JCheckBox("portBPin2");
+  JCheckBox portBPin3 = new JCheckBox("portBPin3");
+  JCheckBox portBPin4 = new JCheckBox("portBPin4");
+  JCheckBox portBPin5 = new JCheckBox("portBPin5");
+  JCheckBox portBPin6 = new JCheckBox("portBPin6");
+  JCheckBox portBPin7 = new JCheckBox("portBPin7");
+  
+  JLabel wRegisterLabel = new JLabel("W-Register");
+  JLabel pcLabel = new JLabel("PC");
+  JLabel pclLabel = new JLabel("PCL");
+  JLabel pcLathLabel = new JLabel("PCLATH");
+  JLabel pswLabel = new JLabel("PSW");
+  JLabel stackpointerLabel = new JLabel("Stackpointer");
+  JLabel instructionRegisterLabel = new JLabel("Instruction-Register");
+  JLabel fsrLabel = new JLabel("FSR");
+  JLabel portALabel = new JLabel("PORTA");
+  JLabel portBLabel = new JLabel("PORTB");
+  JLabel trisALabel = new JLabel("TRISA");
+  JLabel trisBLabel = new JLabel("TRISB");
+  JLabel pinsALabel = new JLabel("PINSA");
+  JLabel pinsBLabel = new JLabel("PINSB");
+  JLabel timer0Label = new JLabel("TIMER0");
+  JLabel eedataLabel = new JLabel("EEDATA");
+  JLabel eeadrLabel = new JLabel("EEADR");
+  JLabel intconLabel = new JLabel("INTCON");
+  JLabel optionLabel = new JLabel("OPTION");
+  JLabel eecon1Label = new JLabel("EECON1");
+  JLabel eecon2Label = new JLabel("EECON2");
+  
  
   
   
@@ -88,13 +137,22 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
   
   //Initializes the main-panel´s layout
   public void initLayout()
-  {	    	  
+  {	   
 	  /* Setting up basic layout */
+	  
+	  
+	          /* PANELS */
 	  
 	  JPanel layoutPanel1 = new JPanel();
 	  JPanel layoutPanel2 = new JPanel();
 	  JPanel layoutPanel3 = new JPanel();
 	  JPanel layoutPanel4 = new JPanel();
+	  JPanel layoutPanel5 = new JPanel();
+	  
+	  JScrollPane scrollPanel = new JScrollPane();
+	  JScrollPane scrollPanel2 = new JScrollPane();
+	  
+	         /* SPLITTER */
 	  
 	  JSplitPane splitter1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	  splitter1.setResizeWeight(0.10);
@@ -102,9 +160,22 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  splitter1.setDividerSize(0);
 	  
 	  JSplitPane splitter2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-	  splitter2.setResizeWeight(0.90);
+	  splitter2.setResizeWeight(0.95);
 	  splitter2.setEnabled(false);
 	  splitter2.setDividerSize(0);
+	  
+	  JSplitPane splitter3 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	  splitter3.setResizeWeight(0.15);
+	  splitter3.setEnabled(false);
+	  splitter3.setDividerSize(0);
+	  
+	  JSplitPane splitter4 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	  splitter4.setResizeWeight(0.15);
+	  splitter4.setEnabled(false);
+	  splitter4.setDividerSize(0);
+	  
+	  
+	      /* INNER PANELS */
  
 	  JPanel contentPanel1 = new JPanel();
 	  JPanel contentPanel2 = new JPanel();
@@ -112,7 +183,8 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  JPanel contentPanel4 = new JPanel();
 	  JPanel contentPanel5 = new JPanel();
 	  JPanel contentPanel6 = new JPanel();
-	  JPanel contentPanel7 = new JPanel();
+	  JPanel contentPanel7_1 = new JPanel();
+	  JPanel contentPanel7_2 = new JPanel();
 	  JPanel contentPanel8 = new JPanel();
 	  JPanel contentPanel9 = new JPanel();
 	  JPanel contentPanel10 = new JPanel();
@@ -122,13 +194,17 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  contentPanel3.setBackground(Color.GREEN);
 	  contentPanel4.setBackground(Color.BLUE);
 	  contentPanel5.setBackground(Color.WHITE);
-	  contentPanel6.setBackground(Color.BLACK);
-	  contentPanel7.setBackground(Color.WHITE);
+	  contentPanel6.setBackground(Color.CYAN);
+	  contentPanel7_1.setBackground(Color.WHITE);
+	  contentPanel7_2.setBackground(Color.ORANGE);
 	  contentPanel8.setBackground(Color.PINK);  
 	  contentPanel9.setBackground(Color.ORANGE); 
 	  contentPanel10.setBackground(Color.BLUE); 
 	  
-	  setLayout(new GridLayout(1,2, 5, 5));
+	  
+	      /* SETTING LAYOUT */
+	  
+	  this.setLayout(new GridLayout(1,2, 5, 5));
 	  
 	  splitter1.add(layoutPanel1);
 	  splitter1.add(layoutPanel2);
@@ -138,39 +214,118 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  splitter2.add(layoutPanel4);
 	  add(splitter2);
 	  
+	  splitter3.add(contentPanel6);
+	  splitter3.add(layoutPanel5);
+	  add(splitter3);
+	  
+	  splitter4.add(contentPanel7_1);
+	  splitter4.add(scrollPanel2);
+	  add(splitter4);
+	  
 	  layoutPanel1.setLayout(new GridLayout(1,4,5,5));
 	  layoutPanel2.setLayout(new GridLayout(1,1,5,5));
-	  layoutPanel3.setLayout(new GridLayout(2,1,5,5));
+	  layoutPanel3.setLayout(new GridLayout(1,1,5,5));
 	  layoutPanel4.setLayout(new GridLayout(1,3,5,5));
+	  layoutPanel5.setLayout(new GridLayout(1,1,5,5));
+	  
+	  scrollPanel.setViewportView(contentPanel5);
 	  
 	  layoutPanel1.add(contentPanel1);
 	  layoutPanel1.add(contentPanel2);
 	  layoutPanel1.add(contentPanel3);
 	  layoutPanel1.add(contentPanel4);
-	  layoutPanel2.add(contentPanel5);
-	  layoutPanel3.add(contentPanel6);
-	  layoutPanel3.add(contentPanel7);
+	  layoutPanel2.add(scrollPanel);
+	  layoutPanel3.add(splitter3);
 	  layoutPanel4.add(contentPanel8);
 	  layoutPanel4.add(contentPanel9);
 	  layoutPanel4.add(contentPanel10);
+	  layoutPanel5.add(splitter4);
 	  
 	  contentPanel1.setLayout(new GridLayout(1,1,5,5));
 	  contentPanel2.setLayout(new GridLayout(1,1,5,5));
 	  contentPanel3.setLayout(new GridLayout(1,1,5,5));
 	  contentPanel4.setLayout(new GridLayout(1,1,5,5));
 	  contentPanel5.setLayout(new GridLayout(1,1,5,5));
-	  contentPanel6.setLayout(new GridLayout(1,1,5,5));
-	  contentPanel7.setLayout(new GridLayout(1,1,5,5));
+	  contentPanel6.setLayout(new GridLayout(2,8,5,5));
+	  contentPanel7_1.setLayout(new GridLayout(3,7,5,5));
+	  contentPanel7_2.setLayout(new GridLayout(1,1,5,5));
 	  contentPanel8.setLayout(new GridBagLayout());
 	  contentPanel9.setLayout(new GridBagLayout());
 	  contentPanel10.setLayout(new GridLayout(1,1,5,5));
 	  
-	  /* Adding GUI-Content */
+	  
+      /* ADDING AND CONFIGURATING GUI-ELEMENTS */
 	  
 	  contentPanel1.add(runButton);
 	  contentPanel2.add(stopButton);
 	  contentPanel3.add(stepButton);
 	  contentPanel4.add(resetButton);
+	  
+	  initLSTGrid(contentPanel5);
+	  
+	  contentPanel6.add(portAPin0);
+	  contentPanel6.add(portAPin1);
+	  contentPanel6.add(portAPin2);
+	  contentPanel6.add(portAPin3);
+	  contentPanel6.add(portAPin4);
+	  contentPanel6.add(new JPanel() {public void paint(Graphics g) {this.setVisible(false);}});
+	  contentPanel6.add(new JPanel() {public void paint(Graphics g) {this.setVisible(false);}});
+	  contentPanel6.add(new JPanel() {public void paint(Graphics g) {this.setVisible(false);}});
+	  
+	  contentPanel6.add(portBPin0);
+	  contentPanel6.add(portBPin1);
+	  contentPanel6.add(portBPin2);
+	  contentPanel6.add(portBPin3);
+	  contentPanel6.add(portBPin4);
+	  contentPanel6.add(portBPin5);
+	  contentPanel6.add(portBPin6);
+	  contentPanel6.add(portBPin7);
+	  
+	  contentPanel7_1.add(wRegisterLabel);
+	  wRegisterLabel.setHorizontalAlignment(wRegisterLabel.getWidth()/2);
+	  contentPanel7_1.add(pcLabel);
+	  pcLabel.setHorizontalAlignment(pcLabel.getWidth()/2);
+	  contentPanel7_1.add(pclLabel);
+	  pclLabel.setHorizontalAlignment(pclLabel.getWidth()/2);
+	  contentPanel7_1.add(pcLathLabel);
+	  pcLathLabel.setHorizontalAlignment(pcLathLabel.getWidth()/2);
+	  contentPanel7_1.add(pswLabel);
+	  pswLabel.setHorizontalAlignment(pswLabel.getWidth()/2);
+	  contentPanel7_1.add(stackpointerLabel);
+	  stackpointerLabel.setHorizontalAlignment(stackpointerLabel.getWidth()/2);
+	  contentPanel7_1.add(instructionRegisterLabel);
+	  instructionRegisterLabel.setHorizontalAlignment(instructionRegisterLabel.getWidth()/2);
+	  contentPanel7_1.add(fsrLabel);
+	  fsrLabel.setHorizontalAlignment(fsrLabel.getWidth()/2);
+	  contentPanel7_1.add(portALabel);
+	  portALabel.setHorizontalAlignment(portALabel.getWidth()/2);
+	  contentPanel7_1.add(portBLabel);
+	  portBLabel.setHorizontalAlignment(portBLabel.getWidth()/2);
+	  contentPanel7_1.add(trisALabel);
+	  trisALabel.setHorizontalAlignment(trisALabel.getWidth()/2);
+	  contentPanel7_1.add(trisBLabel);
+	  trisBLabel.setHorizontalAlignment(trisBLabel.getWidth()/2);
+	  contentPanel7_1.add(pinsALabel);
+	  pinsALabel.setHorizontalAlignment(pinsALabel.getWidth()/2);
+	  contentPanel7_1.add(pinsBLabel);
+	  pinsBLabel.setHorizontalAlignment(pinsBLabel.getWidth()/2);
+	  contentPanel7_1.add(timer0Label);
+	  timer0Label.setHorizontalAlignment(timer0Label.getWidth()/2);
+	  contentPanel7_1.add(eedataLabel);
+	  eedataLabel.setHorizontalAlignment(eedataLabel.getWidth()/2);
+	  contentPanel7_1.add(eeadrLabel);
+	  eeadrLabel.setHorizontalAlignment(eeadrLabel.getWidth()/2);
+	  contentPanel7_1.add(intconLabel);
+	  intconLabel.setHorizontalAlignment(intconLabel.getWidth()/2);
+	  contentPanel7_1.add(optionLabel);
+	  optionLabel.setHorizontalAlignment(optionLabel.getWidth()/2);
+	  contentPanel7_1.add(eecon1Label);
+	  eecon1Label.setHorizontalAlignment(eecon1Label.getWidth()/2);
+	  contentPanel7_1.add(eecon2Label);
+	  eecon2Label.setHorizontalAlignment(eecon2Label.getWidth()/2);
+	  
+	  scrollPanel2.setViewportView(contentPanel7_2);
+	  contentPanel7_2.add(consoleOutput);
 	  
 	  contentPanel8.add(runtimeCounterLabel);
 	  runtimeCounterLabel.setFont(new Font("Arial", 30, 30));
@@ -187,12 +342,11 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  clockFrequencyScrollbar.setMinimum(32);
 	  clockFrequencyScrollbar.setMaximum(20010);
 	  clockFrequencyScrollbar.setValue(4000);
+	
 	  
-
 	  
-	  initLSTGrid(contentPanel5);
 	  
-	  /* Activating Signal-Listener */
+	  /* ADDING LISTENER TO GUI-ELEMENTS */
 	  
 	  runButton.addActionListener(this);
 	  stopButton.addActionListener(this);
@@ -204,6 +358,20 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	  for(int a = 0; a < lstLabelList.length; a++)
 		  lstLabelList[a].addMouseListener(this);
 	  
+	  portAPin0.addItemListener(this);
+	  portAPin1.addItemListener(this);
+	  portAPin2.addItemListener(this);
+	  portAPin3.addItemListener(this);
+	  portAPin4.addItemListener(this);
+	  
+	  portBPin0.addItemListener(this);
+	  portBPin1.addItemListener(this);
+	  portBPin2.addItemListener(this);
+	  portBPin3.addItemListener(this);
+	  portBPin4.addItemListener(this);
+	  portBPin5.addItemListener(this);
+	  portBPin6.addItemListener(this);
+	  portBPin7.addItemListener(this);
   }
   
   
@@ -220,13 +388,133 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 		  lstLabelList[i].setBackground(Color.GREEN);
 		  
 		  if(!lstText[i].substring(0,4).equals("    "))
-		      lstLabelList[i].lineNumber = Integer.parseInt(lstText[i].substring(0,4));
+		    lstLabelList[i].lineNumber = Integer.decode("0x"+lstText[i].substring(0,4));  	 
 		  else
 			  lstLabelList[i].lineNumber = -1; 
 	      
 	      LSTPanel.add(lstLabelList[i]);
 	    }
      }
+  
+  public void updateRegisterLabels()
+    {
+	  wRegisterLabel.setText("W: " + String.format("%2X", Pic16F84Registers.W_REGISTER) + "h");
+	  pcLabel.setText("PC: " + String.format("%2X", Pic16F84Registers.PC) + "h");
+	  pclLabel.setText("PCL: " + String.format("%2X", Pic16F84Registers.PCL) + "h");
+	  pcLathLabel.setText("PCLATH: " + String.format("%2X", Pic16F84Registers.PCLATH) + "h");
+	  pswLabel.setText("PSW: " + String.format("%2X", Pic16F84Registers.PSW) + "h");
+	  stackpointerLabel.setText("STKPTR: " + String.format("%2X", Pic16F84Registers.STACKPOINTER) + "h");
+	  instructionRegisterLabel.setText("IR: " + String.format("%2X", Pic16F84Registers.INSTRUCTION_REGISTER) + "h");
+	  fsrLabel.setText("FSR: " + String.format("%2X", Pic16F84Registers.FSR) + "h");
+	  portALabel.setText("PORTA: " + String.format("%2X", Pic16F84Registers.PORT_A_REGISTER) + "h");
+	  portBLabel.setText("PORTB: " + String.format("%2X", Pic16F84Registers.PORT_B_REGISTER) + "h");
+	  trisALabel.setText("TRISA: " + String.format("%2X", Pic16F84Registers.TRIS_A_REGISTER) + "h");
+	  trisBLabel.setText("TRISB: " + String.format("%2X", Pic16F84Registers.TRIS_B_REGISTER) + "h");;
+	  pinsALabel.setText("PINSA: " + String.format("%2X", Pic16F84Registers.PORT_A_PINS) + "h");
+	  pinsBLabel.setText("PINSB: " + String.format("%2X", Pic16F84Registers.PORT_B_PINS) + "h");
+	  timer0Label.setText("TMR0: " + "N/A"); //TODO
+	  eedataLabel.setText("EEDATA: " + "N/A"); //TODO
+	  eeadrLabel.setText("EEADR: " + "N/A"); //TODO
+	  intconLabel.setText("INTCON: " + "N/A"); //TODO
+	  optionLabel.setText("OPTION: " + "N/A"); //TODO
+	  eecon1Label.setText("EECON1: " + "N/A"); //TODO
+	  eecon2Label.setText("EECON2: " + "N/A"); //TODO
+    }
+  
+  
+  //Enables or disables Checkboxes according to those bits set in Tris-Registers A and B (1 = input = checkbox enabled, 0 = output = checkbox disabled)
+  public void setCheckboxesToTrisState()
+    {
+	  markCheckboxAsInputOrOutput(portAPin0, 0, 'A');
+	  markCheckboxAsInputOrOutput(portAPin1, 1, 'A');
+	  markCheckboxAsInputOrOutput(portAPin2, 2, 'A');
+	  markCheckboxAsInputOrOutput(portAPin3, 3, 'A');
+	  markCheckboxAsInputOrOutput(portAPin4, 4, 'A');
+	  markCheckboxAsInputOrOutput(portBPin0, 0, 'B');
+	  markCheckboxAsInputOrOutput(portBPin1, 1, 'B');
+	  markCheckboxAsInputOrOutput(portBPin2, 2, 'B');
+	  markCheckboxAsInputOrOutput(portBPin3, 3, 'B');
+	  markCheckboxAsInputOrOutput(portBPin4, 4, 'B');
+	  markCheckboxAsInputOrOutput(portBPin5, 5, 'B');
+	  markCheckboxAsInputOrOutput(portBPin6, 6, 'B');
+	  markCheckboxAsInputOrOutput(portBPin7, 7, 'B');
+	  
+	  leadPortBitToCheckboxIfSetAsOutput(portAPin0, 0, 'A');
+	  leadPortBitToCheckboxIfSetAsOutput(portAPin1, 1, 'A');
+	  leadPortBitToCheckboxIfSetAsOutput(portAPin2, 2, 'A');
+	  leadPortBitToCheckboxIfSetAsOutput(portAPin3, 3, 'A');
+	  leadPortBitToCheckboxIfSetAsOutput(portAPin4, 4, 'A');
+	  leadPortBitToCheckboxIfSetAsOutput(portBPin0, 0, 'B');
+	  leadPortBitToCheckboxIfSetAsOutput(portBPin1, 1, 'B');
+	  leadPortBitToCheckboxIfSetAsOutput(portBPin2, 2, 'B');
+	  leadPortBitToCheckboxIfSetAsOutput(portBPin3, 3, 'B');
+	  leadPortBitToCheckboxIfSetAsOutput(portBPin4, 4, 'B');
+	  leadPortBitToCheckboxIfSetAsOutput(portBPin5, 5, 'B');
+	  leadPortBitToCheckboxIfSetAsOutput(portBPin6, 6, 'B');
+	  leadPortBitToCheckboxIfSetAsOutput(portBPin7, 7, 'B');
+    }
+  
+  
+  //Enables or disables Checkboxes according to those bits set in Tris-Registers A and B (1 = input = checkbox enabled, 0 = output = checkbox disabled)
+  public void markCheckboxAsInputOrOutput(JCheckBox checkbox, int trisPin, char portName)
+    {
+	  if(portName == 'A' || portName == 'a')
+	    {
+		 if(((Pic16F84Registers.TRIS_A_REGISTER & (1 << trisPin)) >> trisPin) == 0)
+		   {checkbox.setEnabled(false);
+		    checkbox.setBackground(Color.decode("#E37C83"));}
+		 if(((Pic16F84Registers.TRIS_A_REGISTER & (1 << trisPin)) >> trisPin) == 1)
+		   {checkbox.setEnabled(true);
+		    checkbox.setBackground(Color.decode("#6AEC7C"));}
+	    }
+	  else if(portName == 'B' || portName == 'b')
+	    {
+		 if(((Pic16F84Registers.TRIS_B_REGISTER & (1 << trisPin)) >> trisPin) == 0)
+		   {checkbox.setEnabled(false);
+		    checkbox.setBackground(Color.decode("#E37C83"));}
+		 if(((Pic16F84Registers.TRIS_B_REGISTER & (1 << trisPin)) >> trisPin) == 1)
+		   {checkbox.setEnabled(true);
+		    checkbox.setBackground(Color.decode("#6AEC7C"));}
+	    }
+	  else
+		SimulatorGUI.consoleOutput.append("ERROR: Wrong Port Selected!\n");
+    }
+  
+  
+  //Changes state of a checkbox-pin depending on it´s port-bit if set to output (visual update, no actual change on register values)
+  public void leadPortBitToCheckboxIfSetAsOutput(JCheckBox checkbox, int trisPin, char portName)
+    {
+	  if(portName == 'A' || portName == 'a')
+	    {
+		 int portBitValue = (Pic16F84Registers.PORT_A_REGISTER & (1 << trisPin)) >> trisPin; 
+
+		 if(portBitValue == 1)
+		   checkbox.setSelected(true);
+		 else
+		   checkbox.setSelected(false);
+	    }
+	  else if(portName == 'B' || portName == 'b')
+	    {
+		 int portBitValue = (Pic16F84Registers.PORT_B_REGISTER & (1 << trisPin)) >> trisPin; 
+			
+		 if(portBitValue == 1)
+		   checkbox.setSelected(true);
+		 else
+		   checkbox.setSelected(false);
+	    }
+	  else
+		SimulatorGUI.consoleOutput.append("ERROR: Wrong Port Selected!\n");
+    }
+  
+  
+  //On a Checkbox event: sets the corresponding pin underneath to 1 or 0 depending if checkbox has just been checked or unchecked
+  public void leadCheckboxEventToPort(JCheckBox checkbox, int pinNumber, char portName)
+    {
+	 if(checkbox.isSelected())
+	   Pic16F84Registers.setPin(pinNumber, portName);
+	 else
+	    Pic16F84Registers.resetPin(pinNumber, portName);
+    }
   
   
 	//Checking if next next command contains a breakpoint by comparing PC with every Label available in the GUI´s Taggedlabel-list
@@ -297,14 +585,15 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 			  {
 			   if(!checkForBreakPoint(Pic16F84Registers.PC, lstLabelList))
 			     {
-				  System.out.println("Initializing next Cycle...");
+				  SimulatorGUI.consoleOutput.append("Initializing next Cycle...\n");
 				  simulator.executeStep();
 				  repaint();
 				  try {Thread.sleep(50);} catch (InterruptedException e1) {}
 				 }
 			   else
 			     {
-				  System.out.println(">>>Breakpoint reached<<<");
+				  SimulatorGUI.consoleOutput.append(">>>Breakpoint reached<<<\n");
+				  consoleOutput.setCaretPosition(consoleOutput.getDocument().getLength());
 				  try {Thread.sleep(50);} catch (InterruptedException e1) {}
 				 }
 			  }
@@ -326,6 +615,9 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
 	 super.paint(g);
 	 markLine(Pic16F84Registers.PC, lstLabelList);
 	 actualizeCounterAndFrequency();
+	 setCheckboxesToTrisState();
+	 updateRegisterLabels();
+	 consoleOutput.setCaretPosition(consoleOutput.getDocument().getLength());
 	}
 
   
@@ -345,9 +637,9 @@ public void actionPerformed(ActionEvent e)
 			 
 		mainExecutionThread.executionFinished = false;
 		try {startMainExecutionCycle(mainExecutionThread);} catch (InterruptedException e) {}
-		System.out.println("===================================================================="); 
-		System.out.println("=====================Execution Completed============================");  
-		System.out.println("====================================================================");}
+		SimulatorGUI.consoleOutput.append("====================================================================\n"); 
+		SimulatorGUI.consoleOutput.append("=====================Execution Completed============================\n");  
+		SimulatorGUI.consoleOutput.append("====================================================================\n");}
 		 
 		/* ************************ Calling Main Routine in a new Thread ************************** */
 		 
@@ -367,13 +659,14 @@ public void actionPerformed(ActionEvent e)
 		  {
 		   if(!checkForBreakPoint(Pic16F84Registers.PC, lstLabelList))
 		     {
-			  System.out.println("Initializing next Cycle...");
+			  SimulatorGUI.consoleOutput.append("Initializing next Cycle...\n");
 			  try {simulator.executeStep();} catch (InterruptedException e1) {}
 			  repaint();
 			 }
 		   else
-		      System.out.println(">>>Breakpoint reached<<<");	 
+		      SimulatorGUI.consoleOutput.append(">>>Breakpoint reached<<<\n");	 
 		  }  
+		consoleOutput.setCaretPosition(consoleOutput.getDocument().getLength());
 	   }
 	 
 	 //Resets the controller by resetting every register
@@ -401,6 +694,42 @@ public void adjustmentValueChanged(AdjustmentEvent e)
    if(e.getSource() == this.clockFrequencyScrollbar)
    {Simulator.calculateCycleTime((clockFrequencyScrollbar.getValue()*1000));
     repaint();}
+  }
+
+
+@Override //Checkboxes for Pincontrol
+public void itemStateChanged(ItemEvent e) 
+  {
+	JCheckBox clickedCheckbox = (JCheckBox)e.getSource();
+	
+	if(clickedCheckbox == portAPin0)
+		leadCheckboxEventToPort(clickedCheckbox, 0, 'A');
+	if(clickedCheckbox == portAPin1)
+		leadCheckboxEventToPort(clickedCheckbox, 1, 'A');
+	if(clickedCheckbox == portAPin2)
+		leadCheckboxEventToPort(clickedCheckbox, 2, 'A');
+	if(clickedCheckbox == portAPin3)
+		leadCheckboxEventToPort(clickedCheckbox, 3, 'A');
+	if(clickedCheckbox == portAPin4)
+		leadCheckboxEventToPort(clickedCheckbox, 4, 'A');
+	if(clickedCheckbox == portBPin0)
+		leadCheckboxEventToPort(clickedCheckbox, 0, 'B');
+	if(clickedCheckbox == portBPin1)
+		leadCheckboxEventToPort(clickedCheckbox, 1, 'B');
+	if(clickedCheckbox == portBPin2)
+		leadCheckboxEventToPort(clickedCheckbox, 2, 'B');
+	if(clickedCheckbox == portBPin3)
+		leadCheckboxEventToPort(clickedCheckbox, 3, 'B');
+	if(clickedCheckbox == portBPin4)
+		leadCheckboxEventToPort(clickedCheckbox, 4, 'B');
+	if(clickedCheckbox == portBPin5)
+		leadCheckboxEventToPort(clickedCheckbox, 5, 'B');
+	if(clickedCheckbox == portBPin6)
+		leadCheckboxEventToPort(clickedCheckbox, 6, 'B');
+	if(clickedCheckbox == portBPin7)
+		leadCheckboxEventToPort(clickedCheckbox, 7, 'B');
+	
+	Pic16F84Registers.printAllIORegisters();
   }
 
 
