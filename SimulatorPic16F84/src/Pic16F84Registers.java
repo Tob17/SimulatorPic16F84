@@ -462,7 +462,7 @@ public class Pic16F84Registers {
 	   if(portName == 'B' || portName=='b')
 		 PORT_B_PINS |= 1 << pinChanged;
 	   
-	   writePinToPortBit(1, pinChanged, portName);
+	//   writePinToPortBit(1, pinChanged, portName);
 	  }
 	
 	
@@ -474,14 +474,14 @@ public class Pic16F84Registers {
 	   if(portName == 'B' || portName=='b')
 		 PORT_B_PINS &= ~(1 << pinChanged);
 	   
-	   writePinToPortBit(0, pinChanged, portName);
+	 //  writePinToPortBit(0, pinChanged, portName);
 	  }
 	
 	//If a Pin is changed, we write its value into the corresponding PORT-Bit, if the Pin is declared as an input
 	//pinChanged: 000 = Pin0, 001 = Pin1,...
 	//pinValue: pin checked or not
 	//portName: PortA or PortB?	
-	static void writePinToPortBit(int pinValue, int pinChanged, char portName)
+	/*static void writePinToPortBit(int pinValue, int pinChanged, char portName)
 	{
 	 if(portName == 'A' || portName=='a')
 	   {
@@ -523,7 +523,7 @@ public class Pic16F84Registers {
 	   }
 	 else
 		 SimulatorGUI.consoleOutput.append("ERROR: Wrong Port Selected!\n");
-	}
+	}*/
 	
 	
 	//If a Port-Bit is changed, we write its value into the corresponding Pin, if the Pin is declared as an output
@@ -545,11 +545,11 @@ public class Pic16F84Registers {
 			 PORT_A_PINS &= ~(1 << pinChanged); 	
           }
 		//If not, then TRIS-A-Bit has been set to 1 and declared as an Input-Pin, rewriting the value set on the Port-Bit with the value on the corresponding pin
-		else
+		/*else
 		  {
 		   int pinBitValue = (PORT_A_PINS & (1 << pinChanged)) >> pinChanged;
 		   writePinToPortBit(pinBitValue, pinChanged, portName);
-		  }
+		  }*/
 	   }
 	 else if(portName == 'B' || portName=='b')
 	   {
@@ -564,11 +564,11 @@ public class Pic16F84Registers {
 			 PORT_B_PINS &= ~(1 << pinChanged); 	
 	      }
 		//If not, then TRIS-A-Bit has been set to 1 and declared as an Input-Pin, rewriting the value set on the Port-Bit with the value on the corresponding pin
-		else
+		/*else
 		  {
 		   int pinBitValue = (PORT_B_PINS & (1 << pinChanged)) >> pinChanged;
 		   writePinToPortBit(pinBitValue, pinChanged, portName);
-		  }
+		  }*/
 	   }
 	 else
 		 SimulatorGUI.consoleOutput.append("ERROR: Wrong Port Selected!\n");

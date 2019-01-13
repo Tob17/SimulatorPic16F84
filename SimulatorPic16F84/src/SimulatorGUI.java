@@ -508,7 +508,7 @@ public class SimulatorGUI extends JPanel implements ActionListener, MouseListene
   
   
   //On a Checkbox event: sets the corresponding pin underneath to 1 or 0 depending if checkbox has just been checked or unchecked
-  public void leadCheckboxEventToPort(JCheckBox checkbox, int pinNumber, char portName)
+  public void leadCheckboxEventToPin(JCheckBox checkbox, int pinNumber, char portName)
     {
 	 if(checkbox.isSelected())
 	   Pic16F84Registers.setPin(pinNumber, portName);
@@ -703,31 +703,31 @@ public void itemStateChanged(ItemEvent e)
 	JCheckBox clickedCheckbox = (JCheckBox)e.getSource();
 	
 	if(clickedCheckbox == portAPin0)
-		leadCheckboxEventToPort(clickedCheckbox, 0, 'A');
+		leadCheckboxEventToPin(clickedCheckbox, 0, 'A');
 	if(clickedCheckbox == portAPin1)
-		leadCheckboxEventToPort(clickedCheckbox, 1, 'A');
+		leadCheckboxEventToPin(clickedCheckbox, 1, 'A');
 	if(clickedCheckbox == portAPin2)
-		leadCheckboxEventToPort(clickedCheckbox, 2, 'A');
+		leadCheckboxEventToPin(clickedCheckbox, 2, 'A');
 	if(clickedCheckbox == portAPin3)
-		leadCheckboxEventToPort(clickedCheckbox, 3, 'A');
+		leadCheckboxEventToPin(clickedCheckbox, 3, 'A');
 	if(clickedCheckbox == portAPin4)
-		leadCheckboxEventToPort(clickedCheckbox, 4, 'A');
+		leadCheckboxEventToPin(clickedCheckbox, 4, 'A');
 	if(clickedCheckbox == portBPin0)
-		leadCheckboxEventToPort(clickedCheckbox, 0, 'B');
+		leadCheckboxEventToPin(clickedCheckbox, 0, 'B');
 	if(clickedCheckbox == portBPin1)
-		leadCheckboxEventToPort(clickedCheckbox, 1, 'B');
+		leadCheckboxEventToPin(clickedCheckbox, 1, 'B');
 	if(clickedCheckbox == portBPin2)
-		leadCheckboxEventToPort(clickedCheckbox, 2, 'B');
+		leadCheckboxEventToPin(clickedCheckbox, 2, 'B');
 	if(clickedCheckbox == portBPin3)
-		leadCheckboxEventToPort(clickedCheckbox, 3, 'B');
+		leadCheckboxEventToPin(clickedCheckbox, 3, 'B');
 	if(clickedCheckbox == portBPin4)
-		leadCheckboxEventToPort(clickedCheckbox, 4, 'B');
+		leadCheckboxEventToPin(clickedCheckbox, 4, 'B');
 	if(clickedCheckbox == portBPin5)
-		leadCheckboxEventToPort(clickedCheckbox, 5, 'B');
+		leadCheckboxEventToPin(clickedCheckbox, 5, 'B');
 	if(clickedCheckbox == portBPin6)
-		leadCheckboxEventToPort(clickedCheckbox, 6, 'B');
+		leadCheckboxEventToPin(clickedCheckbox, 6, 'B');
 	if(clickedCheckbox == portBPin7)
-		leadCheckboxEventToPort(clickedCheckbox, 7, 'B');
+		leadCheckboxEventToPin(clickedCheckbox, 7, 'B');
 	
 	Pic16F84Registers.printAllIORegisters();
   }

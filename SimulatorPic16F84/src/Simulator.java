@@ -6,7 +6,7 @@ public class Simulator {
 	
 	/* TODO: Implement interruption of an execution and dealing with an interupt separativly */
 	/* TODO: Implement Timer0 Interrupt */
-	/* Implement RB4-RB7 interrupts */
+	/* TODO: Implement RB4-RB7 interrupts */
 	
 	
 	/* >>> STATIC-SIMULATOR-VARIABLES <<< */
@@ -121,7 +121,21 @@ public class Simulator {
 	
 	//Starts the next Cycle of the CPU-Pipeline depending on the condition of registers and flags
 	public void CPU_Cycle()
-	  {
+	  {	
+		//Firstly we check if any interrupt occrured during the execution of a command or at any time in between
+		if(checkForInterrupts())
+		  {
+		   //TODO: Starting ISR
+		    SimulatorGUI.consoleOutput.append("====================================================================\n");  
+		    SimulatorGUI.consoleOutput.append("================ STARTING INTERRUPT SERVICE ROUTINE ================\n");  
+		    SimulatorGUI.consoleOutput.append("====================================================================\n");
+		  }
+		else
+		  {
+		   SimulatorGUI.consoleOutput.append("====================================================================\n");  
+		   SimulatorGUI.consoleOutput.append("====================== NO INTERRUPT PRESENT ========================\n");  
+		   SimulatorGUI.consoleOutput.append("====================================================================\n");  
+		  }
 	   //Execute PC-1 (Pipe 1.)
 	   if(Pic16F84Registers.INSTRUCTION_REGISTER != -1)
 	     {
@@ -166,6 +180,13 @@ public class Simulator {
 		   //Erasing program from page defined by bit3 and bit4 of PCLATH
 	      Pic16F84Registers.PROGRAM_MEMORY[(Pic16F84Registers.PC & 0b1100000000000) + i] = 0;
 	   programMemoryContainsProgram = false;
+	  }
+	
+	//Checks if Interrupt pin is set+
+	public boolean checkForInterrupts()
+	  {
+		//TODO: Interrupt-Checking on several bits in INTCON
+		return false;
 	  }
 	
 }
