@@ -71,23 +71,17 @@ public class Pic16F84Registers {
 
 	/* >>> INIT REGISTERS <<< */
 
-	//Initializes each register with 0
+	//Initializes each register with the reset-value descriped in the datasheet
 	static void initRegisters()
 	{
-		W_REGISTER = 0;
 		PC = 0;
 		PCL = 0;
 		PCLATH = 0;
-		PSW = 0;
+		PSW = (byte)(PSW | 0x18);
 		STACKPOINTER = -1;
 		INSTRUCTION_REGISTER = -1;
-		FSR = 0;
-		PORT_A_REGISTER = 0;
-		PORT_B_REGISTER = 0;
-		TRIS_A_REGISTER = 0;
-		TRIS_B_REGISTER = 0;
-		PORT_A_PINS = 0;
-		PORT_B_PINS = 0;
+		TRIS_A_REGISTER = (byte)0x1F;
+		TRIS_B_REGISTER = (byte)0xFF;
 	}
 
 	
@@ -461,8 +455,6 @@ public class Pic16F84Registers {
 		  PORT_A_PINS |= 1 << pinChanged;
 	   if(portName == 'B' || portName=='b')
 		 PORT_B_PINS |= 1 << pinChanged;
-	   
-	//   writePinToPortBit(1, pinChanged, portName);
 	  }
 	
 	
@@ -473,58 +465,9 @@ public class Pic16F84Registers {
 		 PORT_A_PINS &= ~(1 << pinChanged);
 	   if(portName == 'B' || portName=='b')
 		 PORT_B_PINS &= ~(1 << pinChanged);
-	   
-	 //  writePinToPortBit(0, pinChanged, portName);
 	  }
 	
-	//If a Pin is changed, we write its value into the corresponding PORT-Bit, if the Pin is declared as an input
-	//pinChanged: 000 = Pin0, 001 = Pin1,...
-	//pinValue: pin checked or not
-	//portName: PortA or PortB?	
-	/*static void writePinToPortBit(int pinValue, int pinChanged, char portName)
-	{
-	 if(portName == 'A' || portName=='a')
-	   {
-		 //Check if TRIS-A-Pin has a 1 at selected pin -> Input-Pin
-		 if(((TRIS_A_REGISTER & (1 << pinChanged)) >> pinChanged) == 1)
-           {
-			//Write value 1 to PORT-REGISTER-Bit
-			if(pinValue == 1)
-			   PORT_A_REGISTER |= 1 << pinChanged;
-			//Write value 0 to PORT-REGISTER-Bit
-			else
-			   PORT_A_REGISTER &= ~(1 << pinChanged); 	
-           }
-		 //If not, then TRIS-A-Bit has been set to 0 and declared as an Output-Pin, rewriting the value set on the pin with the PORT-A-Bit
-		 else
-		   {
-		    int portBitValue = (PORT_A_REGISTER & (1 << pinChanged)) >> pinChanged;
-		    writePortBitToPin(portBitValue, pinChanged, portName);
-		   }
-	   }
-	 else if(portName == 'B' || portName=='b')
-	   {
-		 //Check if TRIS-B-Pin has a 1 at selected pin -> Input-Pin
-		 if(((TRIS_B_REGISTER & (1 << pinChanged)) >> pinChanged) == 1)
-           {
-			//Write value 1 to Port-Pin
-			if(pinValue == 1)
-				PORT_B_REGISTER |= 1 << pinChanged;
-			//Write value 0 to Port-Pin
-			else
-				PORT_B_REGISTER &= ~(1 << pinChanged); 			
-           }
-		 //If not, then TRIS-B-Bit has been set to 0 and declared as an Output-Pin, rewriting the value set on the pin with the PORT-B-Bit
-		 else
-		   {
-		    int portBitValue = (PORT_B_REGISTER & (1 << pinChanged)) >> pinChanged;
-		    writePortBitToPin(portBitValue, pinChanged, portName);
-		   }
-	   }
-	 else
-		 SimulatorGUI.consoleOutput.append("ERROR: Wrong Port Selected!\n");
-	}*/
-	
+
 	
 	//If a Port-Bit is changed, we write its value into the corresponding Pin, if the Pin is declared as an output
 	//pinChanged: 000 = Pin0, 001 = Pin1,...
@@ -544,12 +487,6 @@ public class Pic16F84Registers {
 		   else
 			 PORT_A_PINS &= ~(1 << pinChanged); 	
           }
-		//If not, then TRIS-A-Bit has been set to 1 and declared as an Input-Pin, rewriting the value set on the Port-Bit with the value on the corresponding pin
-		/*else
-		  {
-		   int pinBitValue = (PORT_A_PINS & (1 << pinChanged)) >> pinChanged;
-		   writePinToPortBit(pinBitValue, pinChanged, portName);
-		  }*/
 	   }
 	 else if(portName == 'B' || portName=='b')
 	   {
@@ -563,12 +500,6 @@ public class Pic16F84Registers {
 		   else
 			 PORT_B_PINS &= ~(1 << pinChanged); 	
 	      }
-		//If not, then TRIS-A-Bit has been set to 1 and declared as an Input-Pin, rewriting the value set on the Port-Bit with the value on the corresponding pin
-		/*else
-		  {
-		   int pinBitValue = (PORT_B_PINS & (1 << pinChanged)) >> pinChanged;
-		   writePinToPortBit(pinBitValue, pinChanged, portName);
-		  }*/
 	   }
 	 else
 		 SimulatorGUI.consoleOutput.append("ERROR: Wrong Port Selected!\n");
